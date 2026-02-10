@@ -99,31 +99,25 @@ CPF-Final-Project/
 
 ---
 
-### **Session 2: Data Layer** ⚠️ PARTIALLY COMPLETE
-**Date:** February 9, 2026, 13:30-18:15  
-**Commit:** `7d0f4a5` ("Add data layer: IB Gateway fetch script and CSV loader module")  
-**Status:** ⚠️ Code complete, data fetch blocked by SSH tunnel issue
+### **Session 2: Data Layer** ✅ COMPLETE
+**Date:** February 9-10, 2026, 13:30-09:51  
+**Commits:** `7d0f4a5` (code), `babb759` (data + TWS port)  
+**Status:** ✅ Complete, data fetched successfully
 
 **Deliverables:**
-- `scripts/fetch_historical_data.py` - IB Gateway data fetching (10 KB)
+- `scripts/fetch_historical_data.py` - IB TWS data fetching (10 KB)
 - `modules/data/loader.py` - CSV loading & validation (8 KB)
 - `modules/data/__init__.py` - Clean exports
+- Historical EUR/USD data: 8,372 bars (5min), 5,421 bars (4H), 776 bars (1D)
 
-**What Works:**
-- ✅ Code quality (PEP 8, type hints, docstrings)
-- ✅ All functions tested and working
-- ✅ IB Gateway connection works **on cloud server directly**
-- ✅ Data loader validated with test CSVs
-
-**Blocking Issue:**
-- ❌ IB API handshake times out when connecting from Mac through SSH tunnel
-- ❌ TCP connection succeeds but `ib_async` library fails to complete handshake
-- ❌ Tested: timeout increases, gateway restarts, config verification
+**Resolution:**
+- Initial blocker: SSH tunnel to cloud IB Gateway - API handshake timeout
+- Solution: Switched to TWS running locally on Mac (port 7497)
+- Updated `IB_PORT = 7497` in constants.py
+- Data fetched successfully in 2 minutes
 
 **API Cost:** $0.65 (5m 13s)  
 **Documentation:** `docs/specifications/spec-02-data-layer.md`, `docs/handoffs/session-02-data-layer.md`
-
-**Decision Point:** Debug tunnel (1-3 hours) OR run fetch on server (10 minutes)
 
 ---
 
