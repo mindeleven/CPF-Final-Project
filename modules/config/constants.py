@@ -28,7 +28,7 @@ INSTRUMENT_EXCHANGE: str = "IDEALPRO"
 # IB Gateway Connection
 # ---------------------------------------------------------------------------
 IB_HOST: str = "127.0.0.1"  # localhost for local testing
-IB_PORT: int = 4002  # Paper trading port
+IB_PORT: int = 7497  # Paper trading port
 IB_CLIENT_ID: int = 100  # For data fetching (different from live trading)
 
 # ---------------------------------------------------------------------------
