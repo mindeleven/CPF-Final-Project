@@ -201,29 +201,44 @@ CPF-Final-Project/
 
 **Active Session:** Planning for Session 5  
 **Next Task:** Backtesting Engine  
-**Progress:** 4 of 8 sessions complete (50% milestone reached!)
+**Progress:** 5 of 8 sessions (62.5%)
 
 ---
 
-## 📋 Upcoming Sessions (Planned)
+### **Session 5: Backtesting Engine** ✅ COMPLETE
+**Date:** February 10, 2026, 14:30-15:04  
+**Commit:** `da3cd93` ("Add backtesting engine module")  
+**Status:** ✅ Complete, all tests passed
 
-### **Session 5: Backtesting Engine** 📋 NEXT
-**Prerequisites:** All previous sessions ✅
-
-**Files to create:**
-- `modules/backtest/__init__.py`
-- `modules/backtest/engine.py` - Main backtesting loop
-- `modules/backtest/transaction_costs.py` - Spread/commission modeling
-- `modules/backtest/metrics.py` - Sharpe, MDD, Win Rate, Total Return
+**Deliverables:**
+- `modules/backtest/__init__.py` - Package exports
+- `modules/backtest/engine.py` - Bar-by-bar backtesting engine
+- `modules/backtest/transaction_costs.py` - Spread + commission modeling
+- `modules/backtest/metrics.py` - Performance calculations (Sharpe, MDD, win rate, etc.)
 
 **Key Features:**
-- Process strategy signals bar-by-bar
-- Apply transaction costs at trade entry/exit
-- Track positions and calculate P&L
-- Compute performance metrics
-- Generate trade log for analysis
+- Signal execution at next bar open (no look-ahead bias)
+- Transaction costs applied at entry AND exit
+- Bar-by-bar equity curve tracking
+- Comprehensive trade logging
+- All performance metrics calculated
 
-**Estimated time:** 10-12 min API usage (~$1.25)
+**Test Results (Realistic):**
+| Timeframe | Return | Sharpe | Max DD | Win Rate | Trades |
+|-----------|--------|--------|--------|----------|--------|
+| 5min | -3.11% | -3.36 | -4.15% | 33.8% | 139 |
+| 4H | -20.79% | -0.93 | -24.57% | 38.2% | 76 |
+| 1D | -20.78% | -1.03 | -23.00% | 0.0% | 3 |
+
+**Transaction Cost Impact Analysis:**
+- 0 pips spread: -0.33% return (near breakeven)
+- 1 pip spread: -3.11% return (realistic)
+- 3 pips spread: -8.67% return (high cost)
+
+**Key Insight:** Negative returns demonstrate honest backtesting without curve-fitting. Transaction costs have massive impact (10x larger than strategy edge). Perfect setup for Session 6 optimization.
+
+**API Cost:** ~$0.45 (2m 59s)  
+**Documentation:** `docs/specifications/spec-05-backtesting.md`, `docs/handoffs/session-05-backtesting.md`
 
 ---
 
@@ -362,8 +377,8 @@ flake8==6.1.0
 - **Estimated Remaining:** 4 sessions (2-3 weeks at 2 sessions/week)
 
 **Budget:**
-- **Used:** $2.15 (Sessions 1-4)
-- **Remaining:** $20.72
+- **Used:** $2.60 (Sessions 1-5)
+- **Remaining:** $20.27
 - **Projected Total:** ~$6-7 for entire project
 - **Status:** Excellent, 65% budget buffer
 
