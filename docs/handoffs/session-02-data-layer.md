@@ -200,3 +200,26 @@ scp -r root@157.230.113.17:/root/CPF-Final-Project/data/historical/* ~/CPF-Final
 ---
 
 **Decision Point:** Choose Path A (debug) or Path B (workaround) for next session.
+
+---
+
+## ✅ RESOLUTION (February 10, 2026)
+
+**Final Solution: TWS Local Connection**
+
+**What worked:**
+- Installed and logged into TWS (Trader Workstation) locally on Mac
+- Configured TWS API: Socket port 7497, Trusted IP 127.0.0.1
+- Updated `modules/config/constants.py`: `IB_PORT = 7497`
+- Data fetched successfully in ~2 minutes
+
+**Data fetched:**
+- 5min: 8,372 bars (531 KB) - 2025-12-29 to 2026-02-10
+- 4H: 5,421 bars (343 KB) - 2023-02-12 to 2026-02-10
+- Daily: 776 bars (38 KB) - 2023-02-13 to 2026-02-10
+
+**Final commit:** `babb759` ("Update port to TWS 7497 and add historical EUR/USD data")
+
+**Lesson learned:** Local TWS connection simpler and more reliable than SSH tunnel to cloud Gateway for development workflow.
+
+**SSH tunnel issue:** Deferred for post-project investigation (not blocking).
