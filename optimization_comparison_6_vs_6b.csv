@@ -1,0 +1,5 @@
+Timeframe,Session,Position_Size,Best_Sharpe,Best_Return_Pct,Best_SMA_Fast,Best_SMA_Slow,Best_RSI_Lower,Best_RSI_Upper,Best_Mom_Threshold,Num_Trades
+5min,6 (10K),10000,4.55,4.13,15,70,35,75,0.0,98
+5min,6B (20K),20000,4.59,8.25,15,70,35,75,0.0,107
+4H,6 (10K),10000,1.42,30.23,20,70,35,70,0.0,51
+4H,6B (20K),20000,1.42,60.46,20,70,35,70,0.0,45
