@@ -1,0 +1,4 @@
+Timeframe,Bars,Signals,Trades,Return (%),Sharpe,Max DD (%),Win Rate (%),Profit Factor
+5min,8372,139,139,-6.23,-3.32,-8.25,33.8,0.83
+4H,5421,76,76,-41.58,-0.88,-47.58,38.2,0.58
+1D,776,3,3,-41.56,-0.95,-45.46,0.0,0.0
