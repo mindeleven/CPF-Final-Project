@@ -3,7 +3,7 @@ Live Trading Bot for EUR/USD Forex
 
 Author: Juergen Kober + Claude Code Opus 4.6
 Date: February 2026
-Session: 7B
+Session: 7C
 
 This bot implements the optimized MA+RSI+Momentum strategy from Session 6B
 for live trading via Interactive Brokers API.
@@ -16,6 +16,7 @@ Key Features:
 - Time-based runtime management
 - Weekend position closing
 - Automatic reconnection with exponential backoff (handles IB Gateway reboots)
+- Position state reconciliation after reconnection (prevents double position errors)
 """
 
 import asyncio
@@ -189,6 +190,145 @@ class LiveTradingBot:
 
         self.logger.error(f"Failed to reconnect after {max_retries} attempts")
         return False
+
+    async def reconcile_positions(self) -> None:
+        """Reconcile bot position state with Interactive Brokers reality.
+
+        Called after reconnection to ensure bot knows about:
+        1. Positions that exist at IB (bot may think FLAT but IB has position)
+        2. Positions closed at IB (bot may think LONG/SHORT but IB is FLAT)
+        3. Position direction changes (rare but possible)
+
+        This prevents:
+        - Double position errors (IBKR only allows one position per pair)
+        - Wrong trades due to state mismatch
+        - Position tracking drift over time
+
+        Uses IB's positions() API to query actual account state.
+        """
+        try:
+            self.logger.info("Reconciling position state with IB...")
+
+            positions = self.ib.positions()
+            await self.ib.sleep(2)
+
+            # Find EUR/USD position
+            eur_usd_position = None
+            for pos in positions:
+                if hasattr(pos.contract, "pair") and pos.contract.pair() == "EURUSD":
+                    eur_usd_position = pos
+                    break
+                elif (
+                    hasattr(pos.contract, "symbol")
+                    and pos.contract.symbol == "EUR"
+                    and hasattr(pos.contract, "currency")
+                    and pos.contract.currency == "USD"
+                ):
+                    eur_usd_position = pos
+                    break
+
+            old_position = self.position
+            old_entry = self.entry_price
+
+            if eur_usd_position:
+                ib_size = eur_usd_position.position
+                ib_avg_cost = eur_usd_position.avgCost
+
+                if ib_size > 0:
+                    self.position = 1
+                    self.entry_price = abs(ib_avg_cost / ib_size)
+                    self.entry_time = datetime.now()
+
+                    if old_position != 1:
+                        self.logger.warning("Position mismatch detected!")
+                        self.logger.warning(
+                            f"  Bot thought: {self._position_name(old_position)} "
+                            f"@ {old_entry:.4f}"
+                        )
+                        self.logger.warning(
+                            f"  IB shows: LONG {abs(ib_size):,.0f} "
+                            f"@ {self.entry_price:.4f}"
+                        )
+                        self.logger.info(
+                            f"Updated bot state to match IB: "
+                            f"LONG @ {self.entry_price:.4f}"
+                        )
+                    else:
+                        self.logger.info(
+                            f"Position confirmed: LONG @ {self.entry_price:.4f} "
+                            f"(size: {abs(ib_size):,.0f})"
+                        )
+
+                elif ib_size < 0:
+                    self.position = -1
+                    self.entry_price = abs(ib_avg_cost / ib_size)
+                    self.entry_time = datetime.now()
+
+                    if old_position != -1:
+                        self.logger.warning("Position mismatch detected!")
+                        self.logger.warning(
+                            f"  Bot thought: {self._position_name(old_position)} "
+                            f"@ {old_entry:.4f}"
+                        )
+                        self.logger.warning(
+                            f"  IB shows: SHORT {abs(ib_size):,.0f} "
+                            f"@ {self.entry_price:.4f}"
+                        )
+                        self.logger.info(
+                            f"Updated bot state to match IB: "
+                            f"SHORT @ {self.entry_price:.4f}"
+                        )
+                    else:
+                        self.logger.info(
+                            f"Position confirmed: SHORT @ {self.entry_price:.4f} "
+                            f"(size: {abs(ib_size):,.0f})"
+                        )
+                else:
+                    self.position = 0
+                    self.entry_price = 0.0
+                    self.entry_time = None
+                    self.logger.warning(
+                        "IB returned position object but size is 0. Setting FLAT."
+                    )
+            else:
+                if old_position != 0:
+                    self.logger.warning("Position mismatch detected!")
+                    self.logger.warning(
+                        f"  Bot thought: {self._position_name(old_position)} "
+                        f"@ {old_entry:.4f}"
+                    )
+                    self.logger.warning("  IB shows: FLAT (no position)")
+                    self.logger.info("Updated bot state to match IB: FLAT")
+                else:
+                    self.logger.info("Position confirmed: FLAT (no open positions)")
+
+                self.position = 0
+                self.entry_price = 0.0
+                self.entry_time = None
+
+            self.logger.info(
+                f"Reconciliation complete. Current state: "
+                f"{self._position_name(self.position)}"
+            )
+
+        except Exception as e:
+            self.logger.error(f"Error during position reconciliation: {e}")
+            self.logger.error("Continuing with current bot state (not updating)")
+
+    def _position_name(self, position: int) -> str:
+        """Convert position integer to readable name.
+
+        Args:
+            position: 1 (LONG), -1 (SHORT), 0 (FLAT).
+
+        Returns:
+            Human-readable position name.
+        """
+        if position == 1:
+            return "LONG"
+        elif position == -1:
+            return "SHORT"
+        return "FLAT"
 
     # =========================================================================
     # Data Streaming
@@ -563,6 +703,7 @@ class LiveTradingBot:
 
         try:
             self.logger.info("Trading bot started")
+            await self.reconcile_positions()
             self.logger.info(f"Checking for signals every {CHECK_FREQUENCY} seconds")
             self.logger.info(
                 "Connection monitoring enabled (handles IB Gateway reboots)"
@@ -588,7 +729,9 @@ class LiveTradingBot:
                         self.logger.error("Reconnection failed. Shutting down.")
                         break
 
-                    self.logger.info("Reconnected successfully. Resuming trading.")
+                    self.logger.info("Reconnected successfully.")
+                    await self.reconcile_positions()
+                    self.logger.info("Position state verified. Resuming trading.")
                     await asyncio.sleep(5)
                     continue
 
