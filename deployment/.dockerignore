@@ -1,0 +1,17 @@
+__pycache__
+*.pyc
+*.pyo
+*.log
+logs/
+.git
+.gitignore
+*.md
+.DS_Store
+*.csv
+data/
+results/
+notebooks/
+docs/
+scripts/
+tests/
+.venv/

@@ -1,0 +1,698 @@
+"""
+Live Trading Bot for EUR/USD Forex
+
+Author: Juergen Kober + Claude Code Opus 4.6
+Date: February 2026
+Session: 7
+
+This bot implements the optimized MA+RSI+Momentum strategy from Session 6B
+for live trading via Interactive Brokers API.
+
+Key Features:
+- Real-time data streaming via IB Gateway
+- Automated signal generation using SMA crossover + RSI + Momentum filters
+- Order execution via IB API (market orders)
+- Trade and P&L logging (CSV + console + log file)
+- Time-based runtime management
+- Weekend position closing
+"""
+
+import asyncio
+import logging
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from ib_async import IB, Forex, MarketOrder
+
+# Add project root to path so we can import our modules
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from modules.indicators import SMA, RSI, Momentum
+
+from config_live import (
+    CHECK_FREQUENCY,
+    CLOSE_BEFORE_WEEKEND,
+    IB_CLIENT_ID,
+    IB_HOST,
+    IB_PORT,
+    INITIAL_CAPITAL,
+    MOMENTUM_PERIOD,
+    MOMENTUM_THRESHOLD,
+    POSITION_SIZE,
+    RSI_LOWER,
+    RSI_PERIOD,
+    RSI_UPPER,
+    RUN_DURATION,
+    SMA_FAST,
+    SMA_SLOW,
+    TIMEFRAME,
+    WEEKEND_CLOSE_TIME,
+)
+
+
+class LiveTradingBot:
+    """Live trading bot for EUR/USD forex.
+
+    Connects to IB Gateway, streams price data, generates signals using
+    the MA+RSI+Momentum strategy with Session 6B optimized parameters,
+    and executes trades automatically.
+
+    Attributes:
+        ib: IB API connection instance.
+        contract: EUR/USD forex contract.
+        position: Current position (1=LONG, -1=SHORT, 0=FLAT).
+        entry_price: Entry price of current position.
+        trades: List of completed trade records.
+        start_time: Bot start timestamp.
+        end_time: Bot stop timestamp (based on RUN_DURATION).
+        initial_capital: Starting capital in USD.
+        current_capital: Current capital including realized P&L.
+    """
+
+    def __init__(self) -> None:
+        """Initialize trading bot with configuration from config_live.py."""
+        self.ib = IB()
+        self.contract = Forex("EURUSD")
+
+        # Position tracking
+        self.position: int = 0  # 0=FLAT, 1=LONG, -1=SHORT
+        self.entry_price: float = 0.0
+        self.entry_time: Optional[datetime] = None
+
+        # Trade logging
+        self.trades: List[Dict] = []
+
+        # Runtime management
+        self.start_time = datetime.now()
+        self.end_time = self._calculate_end_time()
+
+        # Capital tracking
+        self.initial_capital = INITIAL_CAPITAL
+        self.current_capital = self.initial_capital
+
+        # Price history for indicator calculation
+        self.price_history = pd.DataFrame(columns=["timestamp", "close"])
+
+        # Logging (set up before any log calls)
+        self._setup_logging()
+        self.trade_log_file = self._create_trade_log_file()
+
+        self.logger.info(f"Trading Bot initialized for {TIMEFRAME} timeframe")
+        self.logger.info(
+            f"Parameters: SMA {SMA_FAST}/{SMA_SLOW}, "
+            f"RSI {RSI_PERIOD} ({RSI_LOWER}/{RSI_UPPER}), "
+            f"Momentum {MOMENTUM_PERIOD} (threshold {MOMENTUM_THRESHOLD})"
+        )
+        self.logger.info(f"Position size: {POSITION_SIZE:,} EUR")
+        self.logger.info(f"Runtime: {RUN_DURATION}")
+        self.logger.info(
+            f"Bot will run until: {self.end_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+
+    # =========================================================================
+    # Connection Management
+    # =========================================================================
+
+    async def connect(self) -> bool:
+        """Connect to IB Gateway.
+
+        Returns:
+            True if connection successful, False otherwise.
+        """
+        try:
+            await self.ib.connectAsync(IB_HOST, IB_PORT, clientId=IB_CLIENT_ID)
+            self.logger.info(f"Connected to IB Gateway at {IB_HOST}:{IB_PORT}")
+            return True
+        except Exception as e:
+            self.logger.error(f"Failed to connect to IB Gateway: {e}")
+            return False
+
+    async def disconnect(self) -> None:
+        """Disconnect from IB Gateway."""
+        if self.ib.isConnected():
+            self.ib.disconnect()
+            self.logger.info("Disconnected from IB Gateway")
+
+    # =========================================================================
+    # Data Streaming
+    # =========================================================================
+
+    async def fetch_latest_price(self) -> Optional[float]:
+        """Fetch current EUR/USD mid price.
+
+        Returns:
+            Current price, or None if fetch fails.
+        """
+        try:
+            ticker = self.ib.reqMktData(self.contract)
+            await self.ib.sleep(2)  # Wait for data to arrive
+
+            price = None
+            if ticker.midpoint() and not np.isnan(ticker.midpoint()):
+                price = ticker.midpoint()
+            elif ticker.last and not np.isnan(ticker.last):
+                price = ticker.last
+            elif ticker.close and not np.isnan(ticker.close):
+                price = ticker.close
+
+            self.ib.cancelMktData(self.contract)
+
+            if price is None:
+                self.logger.warning("No price data available")
+            return price
+
+        except Exception as e:
+            self.logger.error(f"Error fetching price: {e}")
+            return None
+
+    def update_price_history(self, price: float) -> None:
+        """Add new price to history for indicator calculation.
+
+        Keeps only the most recent bars needed for the slowest indicator
+        plus a buffer.
+
+        Args:
+            price: Current close price.
+        """
+        new_row = pd.DataFrame({"timestamp": [datetime.now()], "close": [price]})
+        self.price_history = pd.concat([self.price_history, new_row], ignore_index=True)
+
+        # Keep only necessary history (max indicator period + buffer)
+        max_period = max(SMA_SLOW, RSI_PERIOD, MOMENTUM_PERIOD) + 50
+        if len(self.price_history) > max_period:
+            self.price_history = self.price_history.tail(max_period).reset_index(
+                drop=True
+            )
+
+    # =========================================================================
+    # Signal Generation
+    # =========================================================================
+
+    def calculate_indicators(self) -> Optional[Dict[str, pd.Series]]:
+        """Calculate technical indicators on price history.
+
+        Returns:
+            Dict with indicator series keyed by name, or None if
+            insufficient data for the slowest indicator.
+        """
+        min_required = SMA_SLOW + 10
+        if len(self.price_history) < min_required:
+            return None
+
+        try:
+            sma_fast_ind = SMA(period=SMA_FAST)
+            sma_slow_ind = SMA(period=SMA_SLOW)
+            rsi_ind = RSI(period=RSI_PERIOD)
+            momentum_ind = Momentum(period=MOMENTUM_PERIOD)
+
+            # Indicators expect a DataFrame with a 'close' column
+            df = self.price_history[["close"]].copy()
+
+            return {
+                "sma_fast": sma_fast_ind.calculate(df),
+                "sma_slow": sma_slow_ind.calculate(df),
+                "rsi": rsi_ind.calculate(df),
+                "momentum": momentum_ind.calculate(df),
+            }
+        except Exception as e:
+            self.logger.error(f"Error calculating indicators: {e}")
+            return None
+
+    def generate_signal(self, indicators: Dict[str, pd.Series]) -> int:
+        """Generate trading signal based on latest indicator values.
+
+        Implements the same crossover + filter logic as MARSIMomentumStrategy:
+        - BUY: fast SMA crosses above slow SMA, RSI < upper, momentum > threshold
+        - SELL: fast SMA crosses below slow SMA, RSI > lower, momentum < -threshold
+
+        Args:
+            indicators: Dict of indicator pd.Series.
+
+        Returns:
+            1 for BUY, -1 for SELL, 0 for HOLD.
+        """
+        sma_fast = indicators["sma_fast"].iloc[-1]
+        sma_slow = indicators["sma_slow"].iloc[-1]
+        sma_fast_prev = indicators["sma_fast"].iloc[-2]
+        sma_slow_prev = indicators["sma_slow"].iloc[-2]
+        rsi = indicators["rsi"].iloc[-1]
+        momentum = indicators["momentum"].iloc[-1]
+
+        # Bail out if any value is NaN
+        if any(
+            pd.isna(v)
+            for v in [sma_fast, sma_slow, sma_fast_prev, sma_slow_prev, rsi, momentum]
+        ):
+            return 0
+
+        # BUY Signal: SMA crossover UP + RSI filter + Momentum filter
+        if (
+            sma_fast_prev <= sma_slow_prev
+            and sma_fast > sma_slow
+            and rsi < RSI_UPPER
+            and momentum > MOMENTUM_THRESHOLD
+        ):
+            self.logger.info(
+                f"BUY Signal: SMA {sma_fast:.5f} crossed above {sma_slow:.5f}, "
+                f"RSI {rsi:.1f}, Momentum {momentum:.6f}"
+            )
+            return 1
+
+        # SELL Signal: SMA crossover DOWN + RSI filter + Momentum filter
+        if (
+            sma_fast_prev >= sma_slow_prev
+            and sma_fast < sma_slow
+            and rsi > RSI_LOWER
+            and momentum < -MOMENTUM_THRESHOLD
+        ):
+            self.logger.info(
+                f"SELL Signal: SMA {sma_fast:.5f} crossed below {sma_slow:.5f}, "
+                f"RSI {rsi:.1f}, Momentum {momentum:.6f}"
+            )
+            return -1
+
+        return 0  # HOLD
+
+    # =========================================================================
+    # Order Execution
+    # =========================================================================
+
+    async def execute_order(self, signal: int, price: float) -> None:
+        """Execute order based on signal.
+
+        Closes existing position if signal is opposite, then opens new position.
+
+        Args:
+            signal: 1 for BUY, -1 for SELL.
+            price: Current market price for logging.
+        """
+        # Close existing position if signal is opposite
+        if self.position != 0 and signal != self.position:
+            await self.close_position(price)
+
+        # Open new position if now FLAT
+        if self.position == 0 and signal != 0:
+            await self.open_position(signal, price)
+
+    async def open_position(self, direction: int, price: float) -> None:
+        """Open new position via IB market order.
+
+        Args:
+            direction: 1 for LONG, -1 for SHORT.
+            price: Current price for logging (actual fill may differ).
+        """
+        try:
+            action = "BUY" if direction == 1 else "SELL"
+            order = MarketOrder(action, POSITION_SIZE)
+
+            trade = self.ib.placeOrder(self.contract, order)
+            await self.ib.sleep(2)  # Wait for fill
+
+            if trade.orderStatus.status == "Filled":
+                fill_price = trade.orderStatus.avgFillPrice or price
+                self.position = direction
+                self.entry_price = fill_price
+                self.entry_time = datetime.now()
+
+                self.logger.info(
+                    f"OPENED: {action} {POSITION_SIZE:,} EUR @ {fill_price:.5f}"
+                )
+            else:
+                self.logger.warning(
+                    f"Order status: {trade.orderStatus.status} " f"(may still fill)"
+                )
+                # Treat as filled at current price for tracking
+                self.position = direction
+                self.entry_price = price
+                self.entry_time = datetime.now()
+
+        except Exception as e:
+            self.logger.error(f"Error executing open order: {e}")
+
+    async def close_position(self, price: float) -> None:
+        """Close current position and log the completed trade.
+
+        Args:
+            price: Current price for logging (actual fill may differ).
+        """
+        if self.position == 0:
+            return
+
+        try:
+            action = "SELL" if self.position == 1 else "BUY"
+            order = MarketOrder(action, POSITION_SIZE)
+
+            trade = self.ib.placeOrder(self.contract, order)
+            await self.ib.sleep(2)
+
+            fill_price = price
+            if trade.orderStatus.status == "Filled" and trade.orderStatus.avgFillPrice:
+                fill_price = trade.orderStatus.avgFillPrice
+
+            # Calculate P&L
+            gross_pnl = self.position * (fill_price - self.entry_price) * POSITION_SIZE
+            # Transaction costs: 1 pip spread at entry + exit
+            spread_cost = 2 * 0.0001 * POSITION_SIZE
+            net_pnl = gross_pnl - spread_cost
+
+            # Update capital
+            self.current_capital += net_pnl
+
+            # Record trade
+            trade_record = {
+                "entry_time": self.entry_time,
+                "exit_time": datetime.now(),
+                "direction": "LONG" if self.position == 1 else "SHORT",
+                "entry_price": self.entry_price,
+                "exit_price": fill_price,
+                "size": POSITION_SIZE,
+                "gross_pnl": gross_pnl,
+                "costs": spread_cost,
+                "net_pnl": net_pnl,
+                "capital": self.current_capital,
+            }
+            self.trades.append(trade_record)
+            self._save_trade(trade_record)
+
+            self.logger.info(
+                f"CLOSED: {action} {POSITION_SIZE:,} EUR @ {fill_price:.5f}"
+            )
+            self.logger.info(
+                f"P&L: ${net_pnl:.2f} (gross ${gross_pnl:.2f}, "
+                f"costs ${spread_cost:.2f}) | "
+                f"Cumulative: ${self.current_capital - self.initial_capital:.2f}"
+            )
+
+            # Reset position
+            self.position = 0
+            self.entry_price = 0.0
+            self.entry_time = None
+
+        except Exception as e:
+            self.logger.error(f"Error closing position: {e}")
+
+    # =========================================================================
+    # Runtime Management
+    # =========================================================================
+
+    def should_continue_running(self) -> bool:
+        """Check if bot should continue running.
+
+        Returns:
+            True if should continue, False if runtime expired or weekend.
+        """
+        now = datetime.now()
+
+        if now >= self.end_time:
+            self.logger.info(f"Runtime expired ({RUN_DURATION}). Stopping.")
+            return False
+
+        if CLOSE_BEFORE_WEEKEND and self._is_approaching_weekend():
+            self.logger.info("Approaching weekend. Stopping.")
+            return False
+
+        return True
+
+    def _is_approaching_weekend(self) -> bool:
+        """Check if it's Friday at or past the configured close time.
+
+        Returns:
+            True if should close for weekend.
+        """
+        now = datetime.now()
+        if now.weekday() != 4:  # 0=Monday, 4=Friday
+            return False
+
+        hour, minute = map(int, WEEKEND_CLOSE_TIME.split(":"))
+        close_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        return now >= close_time
+
+    def _is_forex_open(self) -> bool:
+        """Check if forex market is likely open.
+
+        Forex trades Sunday ~5pm EST through Friday ~5pm EST.
+        This is an approximate check using local time.
+
+        Returns:
+            True if market is likely open.
+        """
+        now = datetime.now()
+        weekday = now.weekday()  # 0=Monday, 6=Sunday
+
+        # Closed all Saturday
+        if weekday == 5:
+            return False
+
+        # Most of Sunday is closed (opens ~5pm EST)
+        if weekday == 6:
+            return now.hour >= 17
+
+        # Friday closes ~5pm EST
+        if weekday == 4:
+            return now.hour < 17
+
+        # Monday through Thursday: open
+        return True
+
+    def _calculate_end_time(self) -> datetime:
+        """Calculate when bot should stop based on RUN_DURATION config.
+
+        Parses duration strings like "1h", "8h", "5d", "30m".
+
+        Returns:
+            End datetime.
+        """
+        duration = RUN_DURATION.strip().lower()
+
+        if duration.endswith("h"):
+            hours = int(duration[:-1].strip())
+            return self.start_time + timedelta(hours=hours)
+        elif duration.endswith("d"):
+            days = int(duration[:-1].strip())
+            return self.start_time + timedelta(days=days)
+        elif duration.endswith("m"):
+            minutes = int(duration[:-1].strip())
+            return self.start_time + timedelta(minutes=minutes)
+        else:
+            # Default: 8 hours
+            self._log_warning_if_ready(
+                f"Unrecognized RUN_DURATION '{RUN_DURATION}', defaulting to 8h"
+            )
+            return self.start_time + timedelta(hours=8)
+
+    def _log_warning_if_ready(self, msg: str) -> None:
+        """Log a warning if logger is set up, otherwise print."""
+        if hasattr(self, "logger"):
+            self.logger.warning(msg)
+        else:
+            print(f"WARNING: {msg}")
+
+    # =========================================================================
+    # Main Loop
+    # =========================================================================
+
+    async def run(self) -> None:
+        """Main trading loop.
+
+        Connects to IB Gateway, then loops: fetch price, calculate indicators,
+        generate signal, execute trades. Stops when runtime expires, weekend
+        approaches, or an unrecoverable error occurs.
+        """
+        if not await self.connect():
+            self.logger.error("Failed to connect. Exiting.")
+            return
+
+        try:
+            self.logger.info("Trading bot started")
+            self.logger.info(f"Checking for signals every {CHECK_FREQUENCY} seconds")
+
+            iteration = 0
+
+            while self.should_continue_running():
+                iteration += 1
+
+                # Check if market is open
+                if not self._is_forex_open():
+                    self.logger.info("Market closed. Waiting...")
+                    await asyncio.sleep(CHECK_FREQUENCY)
+                    continue
+
+                # Fetch latest price
+                price = await self.fetch_latest_price()
+                if price is None:
+                    await asyncio.sleep(CHECK_FREQUENCY)
+                    continue
+
+                # Update price history
+                self.update_price_history(price)
+
+                # Status update every 10 iterations
+                if iteration % 10 == 0:
+                    remaining = self.end_time - datetime.now()
+                    hours_left = remaining.total_seconds() / 3600
+                    pos_str = (
+                        "LONG"
+                        if self.position == 1
+                        else "SHORT"
+                        if self.position == -1
+                        else "FLAT"
+                    )
+                    self.logger.info(
+                        f"Status: Price={price:.5f}, Position={pos_str}, "
+                        f"Bars={len(self.price_history)}, "
+                        f"P&L=${self.current_capital - self.initial_capital:.2f}, "
+                        f"Remaining={hours_left:.1f}h"
+                    )
+
+                # Calculate indicators and generate signal
+                indicators = self.calculate_indicators()
+                if indicators is not None:
+                    signal = self.generate_signal(indicators)
+                    if signal != 0:
+                        await self.execute_order(signal, price)
+
+                await asyncio.sleep(CHECK_FREQUENCY)
+
+            # Close any open position before shutdown
+            if self.position != 0:
+                self.logger.info("Closing open position before shutdown...")
+                price = await self.fetch_latest_price()
+                if price is not None:
+                    await self.close_position(price)
+
+            self._print_summary()
+
+        except Exception as e:
+            self.logger.error(f"Error in main loop: {e}", exc_info=True)
+        finally:
+            await self.disconnect()
+
+    # =========================================================================
+    # Logging and File Management
+    # =========================================================================
+
+    def _setup_logging(self) -> None:
+        """Set up logging to both file and console."""
+        timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
+        log_dir = Path(__file__).resolve().parent / "logs"
+        log_dir.mkdir(exist_ok=True)
+        log_file = log_dir / f"trading_bot_{timestamp}.log"
+
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            handlers=[
+                logging.FileHandler(log_file),
+                logging.StreamHandler(sys.stdout),
+            ],
+        )
+        self.logger = logging.getLogger(__name__)
+
+    def _create_trade_log_file(self) -> Path:
+        """Create CSV file for trade logging with header row.
+
+        Returns:
+            Path to the trade log CSV file.
+        """
+        timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
+        log_dir = Path(__file__).resolve().parent / "logs"
+        log_dir.mkdir(exist_ok=True)
+        log_file = log_dir / f"trades_{timestamp}.csv"
+
+        with open(log_file, "w") as f:
+            f.write(
+                "entry_time,exit_time,direction,entry_price,exit_price,"
+                "size,gross_pnl,costs,net_pnl,capital\n"
+            )
+
+        return log_file
+
+    def _save_trade(self, trade: Dict) -> None:
+        """Append a completed trade record to the CSV log.
+
+        Args:
+            trade: Dict with trade details.
+        """
+        with open(self.trade_log_file, "a") as f:
+            f.write(
+                f"{trade['entry_time']},{trade['exit_time']},"
+                f"{trade['direction']},"
+                f"{trade['entry_price']:.5f},{trade['exit_price']:.5f},"
+                f"{trade['size']},"
+                f"{trade['gross_pnl']:.2f},{trade['costs']:.2f},"
+                f"{trade['net_pnl']:.2f},{trade['capital']:.2f}\n"
+            )
+
+    def _print_summary(self) -> None:
+        """Print and save final trading session summary."""
+        self.logger.info("")
+        self.logger.info("=" * 70)
+        self.logger.info("TRADING SESSION SUMMARY")
+        self.logger.info("=" * 70)
+        self.logger.info(f"Timeframe: {TIMEFRAME}")
+        self.logger.info(
+            f"Parameters: SMA {SMA_FAST}/{SMA_SLOW}, "
+            f"RSI {RSI_LOWER}/{RSI_UPPER}, Mom {MOMENTUM_THRESHOLD}"
+        )
+        self.logger.info(f"Duration: {datetime.now() - self.start_time}")
+        self.logger.info(f"Total Bars Collected: {len(self.price_history)}")
+        self.logger.info(f"Total Trades: {len(self.trades)}")
+
+        winning_trades: List[float] = []
+        losing_trades: List[float] = []
+
+        if self.trades:
+            net_pnls = [t["net_pnl"] for t in self.trades]
+            winning_trades = [p for p in net_pnls if p > 0]
+            losing_trades = [p for p in net_pnls if p < 0]
+
+            self.logger.info(f"Winning Trades: {len(winning_trades)}")
+            self.logger.info(f"Losing Trades: {len(losing_trades)}")
+            self.logger.info(
+                f"Win Rate: {len(winning_trades) / len(self.trades) * 100:.1f}%"
+            )
+            self.logger.info(f"Total P&L: ${sum(net_pnls):.2f}")
+            self.logger.info(f"Avg Trade: ${np.mean(net_pnls):.2f}")
+            self.logger.info(f"Best Trade: ${max(net_pnls):.2f}")
+            self.logger.info(f"Worst Trade: ${min(net_pnls):.2f}")
+
+        self.logger.info(f"Final Capital: ${self.current_capital:.2f}")
+        total_return = (self.current_capital / self.initial_capital - 1) * 100
+        self.logger.info(f"Return: {total_return:.2f}%")
+        self.logger.info("=" * 70)
+
+        # Save summary to text file
+        summary_file = self.trade_log_file.with_name(
+            self.trade_log_file.stem + "_summary.txt"
+        )
+        with open(summary_file, "w") as f:
+            f.write("Trading Session Summary\n")
+            f.write(f"Timeframe: {TIMEFRAME}\n")
+            f.write(
+                f"Parameters: SMA {SMA_FAST}/{SMA_SLOW}, "
+                f"RSI {RSI_LOWER}/{RSI_UPPER}, Mom {MOMENTUM_THRESHOLD}\n"
+            )
+            f.write(f"Duration: {datetime.now() - self.start_time}\n")
+            f.write(f"Total Trades: {len(self.trades)}\n")
+            if self.trades:
+                net_pnls = [t["net_pnl"] for t in self.trades]
+                f.write(
+                    f"Win Rate: "
+                    f"{len(winning_trades) / len(self.trades) * 100:.1f}%\n"
+                )
+                f.write(f"Total P&L: ${sum(net_pnls):.2f}\n")
+            f.write(f"Final Capital: ${self.current_capital:.2f}\n")
+            f.write(f"Return: {total_return:.2f}%\n")
+
+
+async def main() -> None:
+    """Entry point for the live trading bot."""
+    bot = LiveTradingBot()
+    await bot.run()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
