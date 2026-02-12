@@ -3,7 +3,7 @@ Live Trading Bot for EUR/USD Forex
 
 Author: Juergen Kober + Claude Code Opus 4.6
 Date: February 2026
-Session: 7
+Session: 7B
 
 This bot implements the optimized MA+RSI+Momentum strategy from Session 6B
 for live trading via Interactive Brokers API.
@@ -15,6 +15,7 @@ Key Features:
 - Trade and P&L logging (CSV + console + log file)
 - Time-based runtime management
 - Weekend position closing
+- Automatic reconnection with exponential backoff (handles IB Gateway reboots)
 """
 
 import asyncio
@@ -116,6 +117,14 @@ class LiveTradingBot:
     # Connection Management
     # =========================================================================
 
+    def is_connected(self) -> bool:
+        """Check if connection to IB Gateway is active.
+
+        Returns:
+            True if connected, False otherwise.
+        """
+        return self.ib.isConnected()
+
     async def connect(self) -> bool:
         """Connect to IB Gateway.
 
@@ -125,6 +134,7 @@ class LiveTradingBot:
         try:
             await self.ib.connectAsync(IB_HOST, IB_PORT, clientId=IB_CLIENT_ID)
             self.logger.info(f"Connected to IB Gateway at {IB_HOST}:{IB_PORT}")
+            self.logger.info("Connection monitoring active")
             return True
         except Exception as e:
             self.logger.error(f"Failed to connect to IB Gateway: {e}")
@@ -135,6 +145,50 @@ class LiveTradingBot:
         if self.ib.isConnected():
             self.ib.disconnect()
             self.logger.info("Disconnected from IB Gateway")
+
+    async def reconnect(self, max_retries: int = 10) -> bool:
+        """Attempt to reconnect to IB Gateway with exponential backoff.
+
+        Handles IB Gateway midnight reboot (2-5 minute downtime).
+        Uses exponential backoff to avoid overwhelming the server:
+        Retry 1: 1s, Retry 2: 2s, Retry 3: 4s, ..., Retry 6+: 60s (max).
+        Total time for 10 retries: ~5 minutes.
+
+        Args:
+            max_retries: Maximum number of reconnection attempts.
+
+        Returns:
+            True if reconnected successfully, False if all retries exhausted.
+        """
+        # Disconnect existing connection if any
+        if self.ib.isConnected():
+            self.ib.disconnect()
+            await asyncio.sleep(1)
+
+        for attempt in range(1, max_retries + 1):
+            wait_time = min(2 ** (attempt - 1), 60)
+
+            self.logger.info(
+                f"Reconnection attempt {attempt}/{max_retries} "
+                f"(waiting {wait_time}s before trying)..."
+            )
+
+            await asyncio.sleep(wait_time)
+
+            try:
+                await self.ib.connectAsync(IB_HOST, IB_PORT, clientId=IB_CLIENT_ID)
+
+                if self.ib.isConnected():
+                    self.logger.info(f"Reconnected successfully on attempt {attempt}")
+                    # Re-request market data subscription
+                    self.ib.reqMktData(self.contract)
+                    return True
+
+            except Exception as e:
+                self.logger.warning(f"Reconnection attempt {attempt} failed: {e}")
+
+        self.logger.error(f"Failed to reconnect after {max_retries} attempts")
+        return False
 
     # =========================================================================
     # Data Streaming
@@ -495,11 +549,13 @@ class LiveTradingBot:
     # =========================================================================
 
     async def run(self) -> None:
-        """Main trading loop.
+        """Main trading loop with reconnection handling.
 
         Connects to IB Gateway, then loops: fetch price, calculate indicators,
-        generate signal, execute trades. Stops when runtime expires, weekend
-        approaches, or an unrecoverable error occurs.
+        generate signal, execute trades. Monitors connection health and
+        reconnects automatically if IB Gateway reboots (e.g. midnight EST).
+        Stops when runtime expires, weekend approaches, or an unrecoverable
+        error occurs.
         """
         if not await self.connect():
             self.logger.error("Failed to connect. Exiting.")
@@ -508,11 +564,33 @@ class LiveTradingBot:
         try:
             self.logger.info("Trading bot started")
             self.logger.info(f"Checking for signals every {CHECK_FREQUENCY} seconds")
+            self.logger.info(
+                "Connection monitoring enabled (handles IB Gateway reboots)"
+            )
 
             iteration = 0
 
             while self.should_continue_running():
                 iteration += 1
+
+                # Connection health check
+                if not self.is_connected():
+                    self.logger.warning("Connection lost detected!")
+                    self.logger.info("Attempting automatic reconnection...")
+
+                    if self.position != 0:
+                        self.logger.warning(
+                            "Open position exists but connection lost. "
+                            "Cannot close safely. Will retry after reconnect."
+                        )
+
+                    if not await self.reconnect(max_retries=10):
+                        self.logger.error("Reconnection failed. Shutting down.")
+                        break
+
+                    self.logger.info("Reconnected successfully. Resuming trading.")
+                    await asyncio.sleep(5)
+                    continue
 
                 # Check if market is open
                 if not self._is_forex_open():
