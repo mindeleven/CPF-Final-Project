@@ -3,7 +3,7 @@ Live Trading Bot for EUR/USD Forex
 
 Author: Juergen Kober + Claude Code Opus 4.6
 Date: February 2026
-Session: 7C
+Session: 7D
 
 This bot implements the optimized MA+RSI+Momentum strategy from Session 6B
 for live trading via Interactive Brokers API.
@@ -135,6 +135,13 @@ class LiveTradingBot:
         try:
             await self.ib.connectAsync(IB_HOST, IB_PORT, clientId=IB_CLIENT_ID)
             self.logger.info(f"Connected to IB Gateway at {IB_HOST}:{IB_PORT}")
+
+            # Qualify contract to populate conId (required for data requests and orders)
+            await self.ib.qualifyContracts(self.contract)
+            self.logger.info(
+                f"Contract qualified: {self.contract.symbol} (conId: {self.contract.conId})"
+            )
+
             self.logger.info("Connection monitoring active")
             return True
         except Exception as e:
@@ -181,6 +188,11 @@ class LiveTradingBot:
 
                 if self.ib.isConnected():
                     self.logger.info(f"Reconnected successfully on attempt {attempt}")
+                    # Re-qualify contract (conId may be lost after reconnection)
+                    await self.ib.qualifyContracts(self.contract)
+                    self.logger.info(
+                        f"Contract re-qualified: {self.contract.symbol} (conId: {self.contract.conId})"
+                    )
                     # Re-request market data subscription
                     self.ib.reqMktData(self.contract)
                     return True
@@ -209,8 +221,8 @@ class LiveTradingBot:
         try:
             self.logger.info("Reconciling position state with IB...")
 
+            # positions() is synchronous — returns complete list immediately
             positions = self.ib.positions()
-            await self.ib.sleep(2)
 
             # Find EUR/USD position
             eur_usd_position = None
