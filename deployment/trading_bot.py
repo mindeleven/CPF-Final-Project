@@ -135,7 +135,7 @@ class LiveTradingBot:
         try:
             await self.ib.connectAsync(IB_HOST, IB_PORT, clientId=IB_CLIENT_ID)
             self.logger.info(f"Connected to IB Gateway at {IB_HOST}:{IB_PORT}")
-
+            
             # Qualify contract to populate conId (required for data requests and orders)
             await self.ib.qualifyContracts(self.contract)
             self.logger.info(
