@@ -982,13 +982,23 @@ class LiveTradingBot:
 
                 # Only process new bars (deduplication)
                 if self.last_bar_time is not None and bar["date"] == self.last_bar_time:
-                    # Same bar — no new data yet
+                    # Same bar — heartbeat every 5 checks
+                    if iteration % 5 == 0:
+                        self.logger.info(
+                            f"Waiting for new bar... "
+                            f"(last: {self.last_bar_time}, price: {bar['close']:.5f})"
+                        )
                     await asyncio.sleep(CHECK_FREQUENCY)
                     continue
 
                 # New bar arrived
                 self.last_bar_time = bar["date"]
                 price = bar["close"]
+                self.logger.info(
+                    f"New bar: {bar['date']} | "
+                    f"O={bar['open']:.5f} H={bar['high']:.5f} "
+                    f"L={bar['low']:.5f} C={price:.5f}"
+                )
 
                 # Update price history
                 self.update_price_history(bar)
