@@ -14,7 +14,7 @@ Configuration for live trading bot with Session 6B optimized parameters.
 
 IB_HOST = "localhost"  # IB Gateway running on same machine (Docker host mode)
 IB_PORT = 4002  # Paper trading port (4001 for live)
-IB_CLIENT_ID = 3  # Unique client ID (change if running multiple bots)
+IB_CLIENT_ID = 753  # Unique client ID (change if running multiple bots)
 
 # =============================================================================
 # TIMEFRAME SELECTION
