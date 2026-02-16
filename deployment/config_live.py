@@ -54,8 +54,13 @@ WEEKEND_CLOSE_TIME = "16:00"  # 4:00 PM
 # Position size in EUR (IBKR minimum for forex: 20,000 EUR)
 POSITION_SIZE = 20000
 
-# Initial capital for P&L tracking (USD)
+# Initial capital for P&L tracking (EUR)
+# NOTE: Overridden at startup by actual EUR balance from IB account
 INITIAL_CAPITAL = 10000.0
+
+# Minimum EUR balance required to trade
+# Bot will abort startup if EUR balance is below this threshold
+MIN_EUR_BALANCE = 20000
 
 # =============================================================================
 # STRATEGY PARAMETERS - SESSION 6B OPTIMIZED

@@ -3,16 +3,19 @@ Live Trading Bot for EUR/USD Forex
 
 Author: Juergen Kober + Claude Code Opus 4.6
 Date: February 2026
-Session: 7D
+Session: 7E
 
 This bot implements the optimized MA+RSI+Momentum strategy from Session 6B
 for live trading via Interactive Brokers API.
 
 Key Features:
-- Real-time data streaming via IB Gateway
+- Real-time 5-minute bar data via IB reqHistoricalData
+- Historical warmup on startup (no 70+ minute wait)
 - Automated signal generation using SMA crossover + RSI + Momentum filters
-- Order execution via IB API (market orders)
-- Trade and P&L logging (CSV + console + log file)
+- Order execution via IB API (market orders with GTC TIF)
+- Proper order fill waiting with timeout
+- EUR balance verification before trading
+- Trade and P&L logging (CSV + console + log file) in EUR and USD
 - Time-based runtime management
 - Weekend position closing
 - Automatic reconnection with exponential backoff (handles IB Gateway reboots)
@@ -24,7 +27,7 @@ import logging
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -41,6 +44,7 @@ from config_live import (
     IB_HOST,
     IB_PORT,
     INITIAL_CAPITAL,
+    MIN_EUR_BALANCE,
     MOMENTUM_PERIOD,
     MOMENTUM_THRESHOLD,
     POSITION_SIZE,
@@ -70,8 +74,8 @@ class LiveTradingBot:
         trades: List of completed trade records.
         start_time: Bot start timestamp.
         end_time: Bot stop timestamp (based on RUN_DURATION).
-        initial_capital: Starting capital in USD.
-        current_capital: Current capital including realized P&L.
+        initial_capital: Starting capital in EUR.
+        current_capital: Current capital including realized P&L in EUR.
     """
 
     def __init__(self) -> None:
@@ -91,12 +95,15 @@ class LiveTradingBot:
         self.start_time = datetime.now()
         self.end_time = self._calculate_end_time()
 
-        # Capital tracking
+        # Capital tracking (EUR-denominated)
         self.initial_capital = INITIAL_CAPITAL
         self.current_capital = self.initial_capital
 
         # Price history for indicator calculation
         self.price_history = pd.DataFrame(columns=["timestamp", "close"])
+
+        # Bar tracking for deduplication
+        self.last_bar_time: Optional[datetime] = None
 
         # Logging (set up before any log calls)
         self._setup_logging()
@@ -135,9 +142,9 @@ class LiveTradingBot:
         try:
             await self.ib.connectAsync(IB_HOST, IB_PORT, clientId=IB_CLIENT_ID)
             self.logger.info(f"Connected to IB Gateway at {IB_HOST}:{IB_PORT}")
-            
+
             # Qualify contract to populate conId (required for data requests and orders)
-            await self.ib.qualifyContracts(self.contract)
+            await self.ib.qualifyContractsAsync(self.contract)
             self.logger.info(
                 f"Contract qualified: {self.contract.symbol} (conId: {self.contract.conId})"
             )
@@ -189,12 +196,10 @@ class LiveTradingBot:
                 if self.ib.isConnected():
                     self.logger.info(f"Reconnected successfully on attempt {attempt}")
                     # Re-qualify contract (conId may be lost after reconnection)
-                    await self.ib.qualifyContracts(self.contract)
+                    await self.ib.qualifyContractsAsync(self.contract)
                     self.logger.info(
                         f"Contract re-qualified: {self.contract.symbol} (conId: {self.contract.conId})"
                     )
-                    # Re-request market data subscription
-                    self.ib.reqMktData(self.contract)
                     return True
 
             except Exception as e:
@@ -211,10 +216,8 @@ class LiveTradingBot:
         2. Positions closed at IB (bot may think LONG/SHORT but IB is FLAT)
         3. Position direction changes (rare but possible)
 
-        This prevents:
-        - Double position errors (IBKR only allows one position per pair)
-        - Wrong trades due to state mismatch
-        - Position tracking drift over time
+        Preserves our fill-based entry_price when it exists (more accurate
+        than IB's avgCost for P&L calculation).
 
         Uses IB's positions() API to query actual account state.
         """
@@ -245,11 +248,22 @@ class LiveTradingBot:
             if eur_usd_position:
                 ib_size = eur_usd_position.position
                 ib_avg_cost = eur_usd_position.avgCost
+                ib_entry = abs(ib_avg_cost / ib_size) if ib_size != 0 else 0.0
 
                 if ib_size > 0:
                     self.position = 1
-                    self.entry_price = abs(ib_avg_cost / ib_size)
-                    self.entry_time = datetime.now()
+                    # Only update entry_price from IB if we don't have one
+                    if self.entry_price == 0.0:
+                        self.entry_price = ib_entry
+                        self.logger.info(
+                            f"Entry price set from IB: {self.entry_price:.5f}"
+                        )
+                    else:
+                        self.logger.info(
+                            f"Keeping fill-based entry price: {self.entry_price:.5f} "
+                            f"(IB reports: {ib_entry:.5f})"
+                        )
+                    self.entry_time = self.entry_time or datetime.now()
 
                     if old_position != 1:
                         self.logger.warning("Position mismatch detected!")
@@ -259,7 +273,7 @@ class LiveTradingBot:
                         )
                         self.logger.warning(
                             f"  IB shows: LONG {abs(ib_size):,.0f} "
-                            f"@ {self.entry_price:.4f}"
+                            f"@ {ib_entry:.4f}"
                         )
                         self.logger.info(
                             f"Updated bot state to match IB: "
@@ -273,8 +287,18 @@ class LiveTradingBot:
 
                 elif ib_size < 0:
                     self.position = -1
-                    self.entry_price = abs(ib_avg_cost / ib_size)
-                    self.entry_time = datetime.now()
+                    # Only update entry_price from IB if we don't have one
+                    if self.entry_price == 0.0:
+                        self.entry_price = ib_entry
+                        self.logger.info(
+                            f"Entry price set from IB: {self.entry_price:.5f}"
+                        )
+                    else:
+                        self.logger.info(
+                            f"Keeping fill-based entry price: {self.entry_price:.5f} "
+                            f"(IB reports: {ib_entry:.5f})"
+                        )
+                    self.entry_time = self.entry_time or datetime.now()
 
                     if old_position != -1:
                         self.logger.warning("Position mismatch detected!")
@@ -284,7 +308,7 @@ class LiveTradingBot:
                         )
                         self.logger.warning(
                             f"  IB shows: SHORT {abs(ib_size):,.0f} "
-                            f"@ {self.entry_price:.4f}"
+                            f"@ {ib_entry:.4f}"
                         )
                         self.logger.info(
                             f"Updated bot state to match IB: "
@@ -343,48 +367,156 @@ class LiveTradingBot:
         return "FLAT"
 
     # =========================================================================
+    # Account Balance
+    # =========================================================================
+
+    async def check_eur_balance(
+        self, min_balance: float = MIN_EUR_BALANCE
+    ) -> Tuple[bool, float]:
+        """Check if account has sufficient EUR balance for trading.
+
+        Queries IB accountSummary for TotalCashBalance in EUR.
+
+        Args:
+            min_balance: Minimum required EUR balance.
+
+        Returns:
+            Tuple of (has_sufficient_balance, eur_balance).
+        """
+        try:
+            self.logger.info("Checking EUR balance...")
+
+            account_values = await self.ib.accountSummaryAsync()
+
+            eur_balance = None
+            for item in account_values:
+                if item.tag == "TotalCashBalance" and item.currency == "EUR":
+                    eur_balance = float(item.value)
+                    break
+                elif item.tag == "CashBalance" and item.currency == "EUR":
+                    eur_balance = float(item.value)
+
+            if eur_balance is None:
+                self.logger.warning("Could not determine EUR balance")
+                return False, 0.0
+
+            has_sufficient = eur_balance >= min_balance
+
+            self.logger.info(f"EUR balance: {eur_balance:,.2f} EUR")
+            self.logger.info(f"Required minimum: {min_balance:,.2f} EUR")
+            self.logger.info(
+                f"Status: {'Sufficient' if has_sufficient else 'INSUFFICIENT'}"
+            )
+
+            return has_sufficient, eur_balance
+
+        except Exception as e:
+            self.logger.error(f"Error checking EUR balance: {e}")
+            return False, 0.0
+
+    # =========================================================================
     # Data Streaming
     # =========================================================================
 
-    async def fetch_latest_price(self) -> Optional[float]:
-        """Fetch current EUR/USD mid price.
+    async def load_historical_warmup(self) -> None:
+        """Load historical 5-minute bars for indicator warmup.
 
-        Returns:
-            Current price, or None if fetch fails.
+        Fetches enough bars from IB so that indicators can produce
+        signals immediately, eliminating the 70+ minute cold-start wait.
         """
+        bars_needed = max(SMA_SLOW, RSI_PERIOD + 1, MOMENTUM_PERIOD + 1) + 10
+        # Convert bars to duration string (bars * 5 minutes, in seconds)
+        duration_seconds = bars_needed * 5 * 60
+        duration_str = f"{duration_seconds} S"
+
+        self.logger.info(
+            f"Loading {bars_needed} historical 5-min bars for warmup..."
+        )
+
         try:
-            ticker = self.ib.reqMktData(self.contract)
-            await self.ib.sleep(2)  # Wait for data to arrive
+            bars = await self.ib.reqHistoricalDataAsync(
+                self.contract,
+                endDateTime="",
+                durationStr=duration_str,
+                barSizeSetting="5 mins",
+                whatToShow="MIDPOINT",
+                useRTH=False,
+                formatDate=1,
+            )
 
-            price = None
-            if ticker.midpoint() and not np.isnan(ticker.midpoint()):
-                price = ticker.midpoint()
-            elif ticker.last and not np.isnan(ticker.last):
-                price = ticker.last
-            elif ticker.close and not np.isnan(ticker.close):
-                price = ticker.close
+            if not bars:
+                self.logger.warning("No historical bars returned for warmup")
+                return
 
-            self.ib.cancelMktData(self.contract)
+            # Populate price_history from bars
+            rows = []
+            for bar in bars:
+                rows.append({"timestamp": bar.date, "close": bar.close})
 
-            if price is None:
-                self.logger.warning("No price data available")
-            return price
+            self.price_history = pd.DataFrame(rows)
+
+            # Track last bar time for deduplication
+            if bars:
+                self.last_bar_time = bars[-1].date
+
+            self.logger.info(
+                f"Warmup complete: loaded {len(self.price_history)} bars "
+                f"(need {SMA_SLOW + 10} for signals)"
+            )
 
         except Exception as e:
-            self.logger.error(f"Error fetching price: {e}")
+            self.logger.error(f"Error loading historical warmup: {e}")
+            self.logger.info("Will collect bars in real-time (slower startup)")
+
+    async def fetch_latest_bar(self) -> Optional[Dict]:
+        """Fetch the latest completed 5-minute bar via reqHistoricalData.
+
+        Returns:
+            Dict with {date, open, high, low, close}, or None if fetch fails.
+        """
+        try:
+            bars = await self.ib.reqHistoricalDataAsync(
+                self.contract,
+                endDateTime="",
+                durationStr="300 S",
+                barSizeSetting="5 mins",
+                whatToShow="MIDPOINT",
+                useRTH=False,
+                formatDate=1,
+            )
+
+            if not bars:
+                self.logger.warning("No bar data returned")
+                return None
+
+            latest = bars[-1]
+            return {
+                "date": latest.date,
+                "open": latest.open,
+                "high": latest.high,
+                "low": latest.low,
+                "close": latest.close,
+            }
+
+        except Exception as e:
+            self.logger.error(f"Error fetching bar: {e}")
             return None
 
-    def update_price_history(self, price: float) -> None:
-        """Add new price to history for indicator calculation.
+    def update_price_history(self, bar: Dict) -> None:
+        """Add new bar to price history for indicator calculation.
 
         Keeps only the most recent bars needed for the slowest indicator
         plus a buffer.
 
         Args:
-            price: Current close price.
+            bar: Dict with 'date' and 'close' keys from fetch_latest_bar().
         """
-        new_row = pd.DataFrame({"timestamp": [datetime.now()], "close": [price]})
-        self.price_history = pd.concat([self.price_history, new_row], ignore_index=True)
+        new_row = pd.DataFrame(
+            {"timestamp": [bar["date"]], "close": [bar["close"]]}
+        )
+        self.price_history = pd.concat(
+            [self.price_history, new_row], ignore_index=True
+        )
 
         # Keep only necessary history (max indicator period + buffer)
         max_period = max(SMA_SLOW, RSI_PERIOD, MOMENTUM_PERIOD) + 50
@@ -489,15 +621,41 @@ class LiveTradingBot:
     async def execute_order(self, signal: int, price: float) -> None:
         """Execute order based on signal.
 
-        Closes existing position if signal is opposite, then opens new position.
+        Closes existing position if signal is opposite (with fill confirmation),
+        then opens new position. Includes EUR balance check.
 
         Args:
             signal: 1 for BUY, -1 for SELL.
             price: Current market price for logging.
         """
+        # Balance check before trading
+        has_balance, _ = await self.check_eur_balance()
+        if not has_balance:
+            self.logger.warning(
+                "Insufficient EUR balance. Skipping trade."
+            )
+            return
+
         # Close existing position if signal is opposite
         if self.position != 0 and signal != self.position:
-            await self.close_position(price)
+            close_success = await self.close_position(price)
+
+            if not close_success:
+                self.logger.error(
+                    "Close position failed. Aborting new position open."
+                )
+                return
+
+            # Settlement delay between close and open
+            await asyncio.sleep(1)
+
+            # Verify close completed
+            if self.position != 0:
+                self.logger.error(
+                    f"Position still {self._position_name(self.position)} after close. "
+                    f"Aborting new position open."
+                )
+                return
 
         # Open new position if now FLAT
         if self.position == 0 and signal != 0:
@@ -506,6 +664,9 @@ class LiveTradingBot:
     async def open_position(self, direction: int, price: float) -> None:
         """Open new position via IB market order.
 
+        Uses GTC TIF and waits for fill confirmation with timeout.
+        Sets entry_price from actual fill price.
+
         Args:
             direction: 1 for LONG, -1 for SHORT.
             price: Current price for logging (actual fill may differ).
@@ -513,59 +674,90 @@ class LiveTradingBot:
         try:
             action = "BUY" if direction == 1 else "SELL"
             order = MarketOrder(action, POSITION_SIZE)
+            order.tif = "GTC"
 
             trade = self.ib.placeOrder(self.contract, order)
-            await self.ib.sleep(2)  # Wait for fill
 
-            if trade.orderStatus.status == "Filled":
+            # Wait for fill with timeout
+            timeout = 30
+            elapsed = 0.0
+            while not trade.isDone() and elapsed < timeout:
+                await asyncio.sleep(0.5)
+                elapsed += 0.5
+
+            if trade.isDone() and trade.orderStatus.status == "Filled":
                 fill_price = trade.orderStatus.avgFillPrice or price
                 self.position = direction
                 self.entry_price = fill_price
                 self.entry_time = datetime.now()
 
+                slippage_pips = abs(fill_price - price) * 10000
+
                 self.logger.info(
-                    f"OPENED: {action} {POSITION_SIZE:,} EUR @ {fill_price:.5f}"
+                    f"OPENED: {action} {POSITION_SIZE:,} EUR @ {fill_price:.5f} "
+                    f"(slippage: {slippage_pips:.1f} pips)"
                 )
+                self.logger.info(f"Entry price recorded: {fill_price:.5f}")
             else:
-                self.logger.warning(
-                    f"Order status: {trade.orderStatus.status} " f"(may still fill)"
+                self.logger.error(
+                    f"Order not filled within {timeout}s. "
+                    f"Status: {trade.orderStatus.status}. "
+                    f"NOT updating position state."
                 )
-                # Treat as filled at current price for tracking
-                self.position = direction
-                self.entry_price = price
-                self.entry_time = datetime.now()
 
         except Exception as e:
             self.logger.error(f"Error executing open order: {e}")
 
-    async def close_position(self, price: float) -> None:
+    async def close_position(self, price: float) -> bool:
         """Close current position and log the completed trade.
+
+        Uses GTC TIF and waits for fill confirmation with timeout.
+        Only resets position state after confirmed fill.
 
         Args:
             price: Current price for logging (actual fill may differ).
+
+        Returns:
+            True if position was closed successfully, False otherwise.
         """
         if self.position == 0:
-            return
+            return True
 
         try:
             action = "SELL" if self.position == 1 else "BUY"
             order = MarketOrder(action, POSITION_SIZE)
+            order.tif = "GTC"
 
             trade = self.ib.placeOrder(self.contract, order)
-            await self.ib.sleep(2)
 
-            fill_price = price
-            if trade.orderStatus.status == "Filled" and trade.orderStatus.avgFillPrice:
-                fill_price = trade.orderStatus.avgFillPrice
+            # Wait for fill with timeout
+            timeout = 30
+            elapsed = 0.0
+            while not trade.isDone() and elapsed < timeout:
+                await asyncio.sleep(0.5)
+                elapsed += 0.5
 
-            # Calculate P&L
+            if not trade.isDone():
+                self.logger.error(
+                    f"Close order not filled within {timeout}s. "
+                    f"Status: {trade.orderStatus.status}"
+                )
+                return False
+
+            fill_price = trade.orderStatus.avgFillPrice or price
+
+            # Calculate P&L in USD
             gross_pnl = self.position * (fill_price - self.entry_price) * POSITION_SIZE
             # Transaction costs: 1 pip spread at entry + exit
             spread_cost = 2 * 0.0001 * POSITION_SIZE
             net_pnl = gross_pnl - spread_cost
 
-            # Update capital
-            self.current_capital += net_pnl
+            # Convert to EUR using fill price
+            net_pnl_eur = net_pnl / fill_price if fill_price > 0 else net_pnl
+            gross_pnl_eur = gross_pnl / fill_price if fill_price > 0 else gross_pnl
+
+            # Update capital (EUR-denominated)
+            self.current_capital += net_pnl_eur
 
             # Record trade
             trade_record = {
@@ -578,7 +770,8 @@ class LiveTradingBot:
                 "gross_pnl": gross_pnl,
                 "costs": spread_cost,
                 "net_pnl": net_pnl,
-                "capital": self.current_capital,
+                "net_pnl_eur": net_pnl_eur,
+                "capital_eur": self.current_capital,
             }
             self.trades.append(trade_record)
             self._save_trade(trade_record)
@@ -587,18 +780,24 @@ class LiveTradingBot:
                 f"CLOSED: {action} {POSITION_SIZE:,} EUR @ {fill_price:.5f}"
             )
             self.logger.info(
-                f"P&L: ${net_pnl:.2f} (gross ${gross_pnl:.2f}, "
-                f"costs ${spread_cost:.2f}) | "
-                f"Cumulative: ${self.current_capital - self.initial_capital:.2f}"
+                f"P&L: EUR {net_pnl_eur:.2f} (USD {net_pnl:.2f}) | "
+                f"Gross: EUR {gross_pnl_eur:.2f} (USD {gross_pnl:.2f}), "
+                f"Costs: USD {spread_cost:.2f}"
+            )
+            self.logger.info(
+                f"Cumulative P&L: EUR {self.current_capital - self.initial_capital:.2f}"
             )
 
-            # Reset position
+            # Reset position only after confirmed fill
             self.position = 0
             self.entry_price = 0.0
             self.entry_time = None
 
+            return True
+
         except Exception as e:
             self.logger.error(f"Error closing position: {e}")
+            return False
 
     # =========================================================================
     # Runtime Management
@@ -703,9 +902,10 @@ class LiveTradingBot:
     async def run(self) -> None:
         """Main trading loop with reconnection handling.
 
-        Connects to IB Gateway, then loops: fetch price, calculate indicators,
-        generate signal, execute trades. Monitors connection health and
-        reconnects automatically if IB Gateway reboots (e.g. midnight EST).
+        Connects to IB Gateway, checks EUR balance, loads historical
+        warmup data, then loops: fetch bar, check for new bar, calculate
+        indicators, generate signal, execute trades. Monitors connection
+        health and reconnects automatically if IB Gateway reboots.
         Stops when runtime expires, weekend approaches, or an unrecoverable
         error occurs.
         """
@@ -715,8 +915,29 @@ class LiveTradingBot:
 
         try:
             self.logger.info("Trading bot started")
+
+            # EUR balance check — abort if insufficient
+            has_balance, eur_balance = await self.check_eur_balance()
+            if not has_balance:
+                self.logger.error(
+                    f"Insufficient EUR balance ({eur_balance:,.2f} EUR). "
+                    f"Need at least {MIN_EUR_BALANCE:,.2f} EUR. Aborting."
+                )
+                return
+
+            # Set initial capital from actual EUR balance
+            self.initial_capital = eur_balance
+            self.current_capital = eur_balance
+            self.logger.info(
+                f"Capital set from account: {eur_balance:,.2f} EUR"
+            )
+
             await self.reconcile_positions()
-            self.logger.info(f"Checking for signals every {CHECK_FREQUENCY} seconds")
+
+            # Historical warmup — load bars so indicators work immediately
+            await self.load_historical_warmup()
+
+            self.logger.info(f"Checking for new bars every {CHECK_FREQUENCY} seconds")
             self.logger.info(
                 "Connection monitoring enabled (handles IB Gateway reboots)"
             )
@@ -753,30 +974,42 @@ class LiveTradingBot:
                     await asyncio.sleep(CHECK_FREQUENCY)
                     continue
 
-                # Fetch latest price
-                price = await self.fetch_latest_price()
-                if price is None:
+                # Fetch latest 5-minute bar
+                bar = await self.fetch_latest_bar()
+                if bar is None:
                     await asyncio.sleep(CHECK_FREQUENCY)
                     continue
 
-                # Update price history
-                self.update_price_history(price)
+                # Only process new bars (deduplication)
+                if self.last_bar_time is not None and bar["date"] == self.last_bar_time:
+                    # Same bar — no new data yet
+                    await asyncio.sleep(CHECK_FREQUENCY)
+                    continue
 
-                # Status update every 10 iterations
+                # New bar arrived
+                self.last_bar_time = bar["date"]
+                price = bar["close"]
+
+                # Update price history
+                self.update_price_history(bar)
+
+                # Status update every 10 new bars
                 if iteration % 10 == 0:
                     remaining = self.end_time - datetime.now()
                     hours_left = remaining.total_seconds() / 3600
-                    pos_str = (
-                        "LONG"
-                        if self.position == 1
-                        else "SHORT"
-                        if self.position == -1
-                        else "FLAT"
-                    )
+                    pos_str = self._position_name(self.position)
+
+                    unrealized_pnl = ""
+                    if self.position != 0 and self.entry_price > 0:
+                        upl = self.position * (price - self.entry_price) * POSITION_SIZE
+                        upl_eur = upl / price if price > 0 else upl
+                        unrealized_pnl = f", Unrealized: EUR {upl_eur:.2f}"
+
                     self.logger.info(
                         f"Status: Price={price:.5f}, Position={pos_str}, "
                         f"Bars={len(self.price_history)}, "
-                        f"P&L=${self.current_capital - self.initial_capital:.2f}, "
+                        f"P&L=EUR {self.current_capital - self.initial_capital:.2f}"
+                        f"{unrealized_pnl}, "
                         f"Remaining={hours_left:.1f}h"
                     )
 
@@ -792,9 +1025,9 @@ class LiveTradingBot:
             # Close any open position before shutdown
             if self.position != 0:
                 self.logger.info("Closing open position before shutdown...")
-                price = await self.fetch_latest_price()
-                if price is not None:
-                    await self.close_position(price)
+                bar = await self.fetch_latest_bar()
+                if bar is not None:
+                    await self.close_position(bar["close"])
 
             self._print_summary()
 
@@ -812,7 +1045,7 @@ class LiveTradingBot:
         timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
         log_dir = Path(__file__).resolve().parent / "logs"
         log_dir.mkdir(exist_ok=True)
-        log_file = log_dir / f"trading_bot_{timestamp}.log"
+        log_file = log_dir / f"trading_bot_{TIMEFRAME}_{RUN_DURATION}_{timestamp}.log"
 
         logging.basicConfig(
             level=logging.INFO,
@@ -833,12 +1066,12 @@ class LiveTradingBot:
         timestamp = self.start_time.strftime("%Y%m%d_%H%M%S")
         log_dir = Path(__file__).resolve().parent / "logs"
         log_dir.mkdir(exist_ok=True)
-        log_file = log_dir / f"trades_{timestamp}.csv"
+        log_file = log_dir / f"trades_{TIMEFRAME}_{RUN_DURATION}_{timestamp}.csv"
 
         with open(log_file, "w") as f:
             f.write(
                 "entry_time,exit_time,direction,entry_price,exit_price,"
-                "size,gross_pnl,costs,net_pnl,capital\n"
+                "size,gross_pnl,costs,net_pnl,net_pnl_eur,capital_eur\n"
             )
 
         return log_file
@@ -856,7 +1089,8 @@ class LiveTradingBot:
                 f"{trade['entry_price']:.5f},{trade['exit_price']:.5f},"
                 f"{trade['size']},"
                 f"{trade['gross_pnl']:.2f},{trade['costs']:.2f},"
-                f"{trade['net_pnl']:.2f},{trade['capital']:.2f}\n"
+                f"{trade['net_pnl']:.2f},{trade['net_pnl_eur']:.2f},"
+                f"{trade['capital_eur']:.2f}\n"
             )
 
     def _print_summary(self) -> None:
@@ -876,24 +1110,26 @@ class LiveTradingBot:
 
         winning_trades: List[float] = []
         losing_trades: List[float] = []
+        total_return = 0.0
 
         if self.trades:
-            net_pnls = [t["net_pnl"] for t in self.trades]
-            winning_trades = [p for p in net_pnls if p > 0]
-            losing_trades = [p for p in net_pnls if p < 0]
+            net_pnls_eur = [t["net_pnl_eur"] for t in self.trades]
+            winning_trades = [p for p in net_pnls_eur if p > 0]
+            losing_trades = [p for p in net_pnls_eur if p < 0]
 
             self.logger.info(f"Winning Trades: {len(winning_trades)}")
             self.logger.info(f"Losing Trades: {len(losing_trades)}")
             self.logger.info(
                 f"Win Rate: {len(winning_trades) / len(self.trades) * 100:.1f}%"
             )
-            self.logger.info(f"Total P&L: ${sum(net_pnls):.2f}")
-            self.logger.info(f"Avg Trade: ${np.mean(net_pnls):.2f}")
-            self.logger.info(f"Best Trade: ${max(net_pnls):.2f}")
-            self.logger.info(f"Worst Trade: ${min(net_pnls):.2f}")
+            self.logger.info(f"Total P&L: EUR {sum(net_pnls_eur):.2f}")
+            self.logger.info(f"Avg Trade: EUR {np.mean(net_pnls_eur):.2f}")
+            self.logger.info(f"Best Trade: EUR {max(net_pnls_eur):.2f}")
+            self.logger.info(f"Worst Trade: EUR {min(net_pnls_eur):.2f}")
 
-        self.logger.info(f"Final Capital: ${self.current_capital:.2f}")
-        total_return = (self.current_capital / self.initial_capital - 1) * 100
+        self.logger.info(f"Final Capital: EUR {self.current_capital:,.2f}")
+        if self.initial_capital > 0:
+            total_return = (self.current_capital / self.initial_capital - 1) * 100
         self.logger.info(f"Return: {total_return:.2f}%")
         self.logger.info("=" * 70)
 
@@ -911,13 +1147,13 @@ class LiveTradingBot:
             f.write(f"Duration: {datetime.now() - self.start_time}\n")
             f.write(f"Total Trades: {len(self.trades)}\n")
             if self.trades:
-                net_pnls = [t["net_pnl"] for t in self.trades]
+                net_pnls_eur = [t["net_pnl_eur"] for t in self.trades]
                 f.write(
                     f"Win Rate: "
                     f"{len(winning_trades) / len(self.trades) * 100:.1f}%\n"
                 )
-                f.write(f"Total P&L: ${sum(net_pnls):.2f}\n")
-            f.write(f"Final Capital: ${self.current_capital:.2f}\n")
+                f.write(f"Total P&L: EUR {sum(net_pnls_eur):.2f}\n")
+            f.write(f"Final Capital: EUR {self.current_capital:,.2f}\n")
             f.write(f"Return: {total_return:.2f}%\n")
 
 
