@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# temporary migration files
+migration/03*
+# logfiles of local testruns
+deployment/logs/*
+
 # C extensions
 *.so
 
