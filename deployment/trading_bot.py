@@ -326,6 +326,8 @@ class LiveTradingBot:
                     self.logger.warning(
                         "IB returned position object but size is 0. Setting FLAT."
                     )
+                    if old_position != 0:
+                        self._record_reconcile_close(old_position, old_entry)
             else:
                 if old_position != 0:
                     self.logger.warning("Position mismatch detected!")
@@ -335,6 +337,7 @@ class LiveTradingBot:
                     )
                     self.logger.warning("  IB shows: FLAT (no position)")
                     self.logger.info("Updated bot state to match IB: FLAT")
+                    self._record_reconcile_close(old_position, old_entry)
                 else:
                     self.logger.info("Position confirmed: FLAT (no open positions)")
 
@@ -365,6 +368,53 @@ class LiveTradingBot:
         elif position == -1:
             return "SHORT"
         return "FLAT"
+
+    def _record_reconcile_close(
+        self, old_position: int, old_entry: float
+    ) -> None:
+        """Record estimated P&L when a position vanishes during reconciliation.
+
+        Uses the last known price from price_history as the exit price.
+        Marks the trade direction with '(IB reconcile)' to distinguish
+        it from bot-initiated closes.
+
+        Args:
+            old_position: The position the bot thought it had (1 or -1).
+            old_entry: The entry price of the vanished position.
+        """
+        if len(self.price_history) > 0:
+            exit_price = float(self.price_history["close"].iloc[-1])
+        else:
+            exit_price = old_entry  # fallback: P&L = 0
+
+        gross_pnl = old_position * (exit_price - old_entry) * POSITION_SIZE
+        spread_cost = 2 * 0.0001 * POSITION_SIZE
+        net_pnl = gross_pnl - spread_cost
+        net_pnl_eur = net_pnl / exit_price if exit_price > 0 else net_pnl
+        self.current_capital += net_pnl_eur
+
+        direction_name = self._position_name(old_position)
+        trade_record = {
+            "entry_time": self.entry_time,
+            "exit_time": datetime.now(),
+            "direction": f"{direction_name} (IB reconcile)",
+            "entry_price": old_entry,
+            "exit_price": exit_price,
+            "size": POSITION_SIZE,
+            "gross_pnl": gross_pnl,
+            "costs": spread_cost,
+            "net_pnl": net_pnl,
+            "net_pnl_eur": net_pnl_eur,
+            "capital_eur": self.current_capital,
+        }
+        self.trades.append(trade_record)
+        self._save_trade(trade_record)
+
+        self.logger.warning(
+            f"Position closed by IB (reboot/reset). "
+            f"Estimated exit: {exit_price:.5f}, "
+            f"P&L: EUR {net_pnl_eur:.2f} (USD {net_pnl:.2f})"
+        )
 
     # =========================================================================
     # Account Balance
