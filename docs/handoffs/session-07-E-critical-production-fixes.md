@@ -328,7 +328,7 @@ cd /root/trading_bot
 docker build -f deployment/Dockerfile -t trading-bot:latest .
 
 # Stop old container, start new one
-docker stop trading-bot-5min 2>/dev/null; docker rm trading-bot-5min 2>/dev/null
+docker stop trading-bot-7e 2>/dev/null; docker rm trading-bot-7e 2>/dev/null
 docker run -d \
   --name trading-bot-7e \
   --network host \
