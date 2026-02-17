@@ -248,7 +248,8 @@ class LiveTradingBot:
             if eur_usd_position:
                 ib_size = eur_usd_position.position
                 ib_avg_cost = eur_usd_position.avgCost
-                ib_entry = abs(ib_avg_cost / ib_size) if ib_size != 0 else 0.0
+                # For forex, avgCost is already the per-unit price (exchange rate)
+                ib_entry = abs(ib_avg_cost) if ib_size != 0 else 0.0
 
                 if ib_size > 0:
                     self.position = 1

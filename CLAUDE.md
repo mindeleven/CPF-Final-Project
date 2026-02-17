@@ -142,6 +142,7 @@ These patterns were learned from production bugs. Do not regress:
 | Historical data | `await self.ib.reqHistoricalDataAsync(...)` | `self.ib.reqMktData()` (gives spot ticks, not bars) |
 | Forex contract | `Forex("EURUSD")` | `Stock("EUR", "USD", ...)` |
 | Contract `pair` | `pos.contract.pair()` (method call) | `pos.contract.pair` (not a property) |
+| IB `avgCost` (forex) | `abs(ib_avg_cost)` (already per-unit rate) | `avgCost / position_size` (that's for stocks) |
 | Order TIF | `order.tif = "GTC"` (forex is 24/5) | Default DAY (causes Error 10349) |
 | Fill waiting | 30s loop with `trade.isDone()` | `await self.ib.sleep(2)` (unreliable) |
 
@@ -215,4 +216,6 @@ run()
 | 7C | Reconciliation | Position sync with IB after reconnect |
 | 7D | Contract fixes | qualifyContracts, event loop fix |
 | 7E | Production fixes | 8 bugs fixed, async API, warmup, bar streaming |
+| 7F | Reconciliation P&L | Record estimated P&L when position vanishes |
+| 7G | Entry price fix | avgCost is per-unit for forex, not total cost |
 | 8 | Notebook integration | **PENDING** |
