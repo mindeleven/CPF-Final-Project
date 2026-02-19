@@ -7,8 +7,7 @@ __pycache__/
 migration/03*
 # logfiles of local testruns
 deployment/logs/*
-deployment/logs_temp/*
-deployment/logs_temp_v1/*
+deployment/logs_temp*
 
 # C extensions
 *.so
