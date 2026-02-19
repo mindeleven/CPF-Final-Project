@@ -145,20 +145,25 @@ These patterns were learned from production bugs. Do not regress:
 | IB `avgCost` (forex) | `abs(ib_avg_cost)` (already per-unit rate) | `avgCost / position_size` (that's for stocks) |
 | Order TIF | `order.tif = "GTC"` (forex is 24/5) | Default DAY (causes Error 10349) |
 | Fill waiting | 30s loop with `trade.isDone()` | `await self.ib.sleep(2)` (unreliable) |
+| Soft reconnect | Reconcile on Error 1102 via `_needs_reconciliation` flag | Ignoring Error 1102 (causes stale position state) |
+| Pre-trade verify | `_get_ib_eur_position()` before close-then-open | Trusting bot state without IB check |
 
 ### Bot Architecture
 
 ```
 run()
-  connect() → qualifyContractsAsync()
+  connect() → qualifyContractsAsync() + register _on_error (Error 1102 handler)
   check_eur_balance() → abort if < MIN_EUR_BALANCE
   reconcile_positions() → sync with IB reality, preserve fill-based entry_price
   load_historical_warmup() → reqHistoricalDataAsync, ~80 bars in ~4 seconds
   main loop:
+    connection health check → reconnect + reconcile if disconnected
+    _needs_reconciliation check → reconcile after soft connectivity restore (1102)
     fetch_latest_bar() → reqHistoricalDataAsync, 5-min bars
     deduplicate by bar timestamp (self.last_bar_time)
     calculate_indicators() → generate_signal()
     execute_order():
+      _get_ib_eur_position() → reconcile if mismatch (pre-trade safety net)
       check_eur_balance() before every trade
       close_position() → GTC, 30s wait, returns bool
       sleep(1) settlement delay
@@ -218,4 +223,5 @@ run()
 | 7E | Production fixes | 8 bugs fixed, async API, warmup, bar streaming |
 | 7F | Reconciliation P&L | Record estimated P&L when position vanishes |
 | 7G | Entry price fix | avgCost is per-unit for forex, not total cost |
+| 7H | Connectivity reconciliation | Reconcile on Error 1102 + pre-trade IB position verify |
 | 8 | Notebook integration | **PENDING** |

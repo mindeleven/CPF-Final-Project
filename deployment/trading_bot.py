@@ -3,7 +3,7 @@ Live Trading Bot for EUR/USD Forex
 
 Author: Juergen Kober + Claude Code Opus 4.6
 Date: February 2026
-Session: 7E
+Session: 7H
 
 This bot implements the optimized MA+RSI+Momentum strategy from Session 6B
 for live trading via Interactive Brokers API.
@@ -20,6 +20,8 @@ Key Features:
 - Weekend position closing
 - Automatic reconnection with exponential backoff (handles IB Gateway reboots)
 - Position state reconciliation after reconnection (prevents double position errors)
+- Reconciliation on soft connectivity restore (Error 1102) — prevents stale state
+- Pre-trade IB position verification — safety net before close-then-open logic
 """
 
 import asyncio
@@ -105,6 +107,9 @@ class LiveTradingBot:
         # Bar tracking for deduplication
         self.last_bar_time: Optional[datetime] = None
 
+        # Reconciliation flag — set by Error 1102 handler, consumed by main loop
+        self._needs_reconciliation: bool = False
+
         # Logging (set up before any log calls)
         self._setup_logging()
         self.trade_log_file = self._create_trade_log_file()
@@ -149,6 +154,9 @@ class LiveTradingBot:
                 f"Contract qualified: {self.contract.symbol} (conId: {self.contract.conId})"
             )
 
+            # Register error handler for connectivity events
+            self.ib.errorEvent += self._on_error
+
             self.logger.info("Connection monitoring active")
             return True
         except Exception as e:
@@ -160,6 +168,29 @@ class LiveTradingBot:
         if self.ib.isConnected():
             self.ib.disconnect()
             self.logger.info("Disconnected from IB Gateway")
+
+    def _on_error(
+        self, reqId: int, errorCode: int, errorString: str, contract: str
+    ) -> None:
+        """Handle IB error events.
+
+        Monitors for Error 1102 (connectivity restored) and sets a flag
+        to trigger position reconciliation in the main loop. This catches
+        "soft" connectivity losses where the TCP connection stays alive
+        but IB internally disconnects and reconnects.
+
+        Args:
+            reqId: Request ID (-1 for connection-level errors).
+            errorCode: IB error code.
+            errorString: Error description.
+            contract: Contract associated with the error (may be empty).
+        """
+        if errorCode == 1102:
+            self.logger.warning(
+                "Connectivity restored (Error 1102). "
+                "Scheduling position reconciliation."
+            )
+            self._needs_reconciliation = True
 
     async def reconnect(self, max_retries: int = 10) -> bool:
         """Attempt to reconnect to IB Gateway with exponential backoff.
@@ -369,6 +400,36 @@ class LiveTradingBot:
         elif position == -1:
             return "SHORT"
         return "FLAT"
+
+    def _get_ib_eur_position(self) -> int:
+        """Query IB for current EUR/USD position direction.
+
+        Uses ib.positions() (synchronous, returns cached data) and
+        matches the EUR/USD contract.
+
+        Returns:
+            1 (LONG), -1 (SHORT), or 0 (FLAT).
+        """
+        positions = self.ib.positions()
+        for pos in positions:
+            if hasattr(pos.contract, "pair") and pos.contract.pair() == "EURUSD":
+                if pos.position > 0:
+                    return 1
+                elif pos.position < 0:
+                    return -1
+                return 0
+            elif (
+                hasattr(pos.contract, "symbol")
+                and pos.contract.symbol == "EUR"
+                and hasattr(pos.contract, "currency")
+                and pos.contract.currency == "USD"
+            ):
+                if pos.position > 0:
+                    return 1
+                elif pos.position < 0:
+                    return -1
+                return 0
+        return 0
 
     def _record_reconcile_close(
         self, old_position: int, old_entry: float
@@ -672,13 +733,24 @@ class LiveTradingBot:
     async def execute_order(self, signal: int, price: float) -> None:
         """Execute order based on signal.
 
-        Closes existing position if signal is opposite (with fill confirmation),
-        then opens new position. Includes EUR balance check.
+        Verifies IB position matches bot state before acting, closes existing
+        position if signal is opposite (with fill confirmation), then opens
+        new position. Includes EUR balance check.
 
         Args:
             signal: 1 for BUY, -1 for SELL.
             price: Current market price for logging.
         """
+        # Pre-trade position verification (Fix B: catch stale state)
+        ib_pos = self._get_ib_eur_position()
+        if ib_pos != self.position:
+            self.logger.warning(
+                f"Pre-trade check: bot state is "
+                f"{self._position_name(self.position)} but IB shows "
+                f"{self._position_name(ib_pos)}. Reconciling before trade..."
+            )
+            await self.reconcile_positions()
+
         # Balance check before trading
         has_balance, _ = await self.check_eur_balance()
         if not has_balance:
@@ -1018,6 +1090,14 @@ class LiveTradingBot:
                     self.logger.info("Position state verified. Resuming trading.")
                     await asyncio.sleep(5)
                     continue
+
+                # Reconcile after soft connectivity restore (Error 1102)
+                if self._needs_reconciliation:
+                    self._needs_reconciliation = False
+                    self.logger.info(
+                        "Running scheduled reconciliation after connectivity restore..."
+                    )
+                    await self.reconcile_positions()
 
                 # Check if market is open
                 if not self._is_forex_open():
