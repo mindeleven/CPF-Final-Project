@@ -118,4 +118,41 @@ values of risk-adjusted metrics differ and must be recomputed.
 
 ---
 
+## Planned: Error 1100 Backend Disconnect Pause Flag
+
+**Context:** IB Gateway performs a daily server reset (~00:15-01:45 ET, roughly
+05:30-07:00 CET on our DigitalOcean droplet). This triggers Error 1100
+("Connectivity between IBKR and Trader Workstation has been lost") followed
+60-90 minutes later by Error 1102 (connectivity restored).
+
+**Current state:** Session 7H added an Error 1102 handler that sets
+`_needs_reconciliation = True`, consumed by the main loop to trigger
+`reconcile_positions()`. The bot already survives the reset — failed
+`fetch_latest_bar()` calls return `None` and the loop continues gracefully.
+However, the bot does not explicitly detect Error 1100, so during the reset
+window it keeps polling, generating noisy failed-request warnings in the log.
+
+**Planned change (no code written yet):** Add an `is_backend_connected` flag
+to `_on_error()`:
+
+- **Error 1100 received:** set `self.is_backend_connected = False`, log once
+  that the IB daily reset has started and trading is paused.
+- **Error 1102 received:** set `self.is_backend_connected = True` (in addition
+  to existing `_needs_reconciliation` flag).
+- **Main loop:** check `is_backend_connected` early; if `False`, sleep and
+  `continue` without attempting data fetches or order execution.
+
+**Benefits:**
+1. Eliminates repeated error logs during the 60-90 min reset window.
+2. Prevents any possibility of order attempts during backend disconnect.
+3. Produces a clean log narrative: "reset started -> paused -> reset ended ->
+   reconciled -> resumed".
+4. Demonstrates awareness of IB's daily maintenance cycle (useful for CPF report
+   "Production Reliability" section).
+
+**Implementation effort:** ~10 lines of code in `trading_bot.py`. To be done
+in a future session when the bot code is next modified.
+
+---
+
 **End of Session 8A Handoff**
