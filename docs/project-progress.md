@@ -1,308 +1,247 @@
 # CPF Final Project - Progress Report
-**Date:** February 13, 2026  
-**Status:** 92% Complete - Live Bot Functional But Needs Critical Fixes  
-**Timeline:** 6 weeks to deadline (March 31, 2026) - Excellent buffer  
-**Budget:** $11.58 of $25.00 used (46%), $13.42 remaining
+**Date:** February 21, 2026
+**Status:** ~95% Complete - Live Bot Production-Ready, Notebook In Progress
+**Timeline:** 5.5 weeks to deadline (March 31, 2026)
 
 ---
 
-## 📊 Project Overview
+## Project Overview
 
-**Goal:** Automated EUR/USD forex trading system with optimized strategy  
-**Approach:** Data → Indicators → Strategy → Backtest → Optimize → Live Deploy  
-**Platform:** DigitalOcean droplet (157.230.113.17) with IB Gateway + Docker  
+**Goal:** Automated EUR/USD forex trading system with optimized strategy
+**Approach:** Data → Indicators → Strategy → Backtest → Optimize → Live Deploy
+**Platform:** DigitalOcean droplet (157.230.113.17) with IB Gateway + Docker
 **Account:** Paper trading EUR account (~900K EUR)
+**Account currency:** EUR (not USD)
+**Position size:** 20,000 EUR | **Initial capital:** 20,000 EUR (no leverage)
 
 ---
 
-## ✅ Completed Sessions (1-7D)
+## Completed Sessions
 
-### **Session 1: Configuration Module** ✅
-- Global configuration system
-- Parameter management
-- Cost: $1.25
+### Session 1: Configuration Module
+- Global configuration system (constants, timeframes, validation)
+- `modules/config/`
 
-### **Session 2: Data Layer** ✅
-- Historical data fetching from IB
-- OHLC bar processing
-- Cost: $1.50
+### Session 2: Data Layer
+- Historical data fetching from IB (`scripts/fetch_historical_data.py`)
+- CSV loader, validation, datetime indexing (`modules/data/`)
+- Data directories: `data/historical/{5min,4H,1D}/`
 
-### **Session 3: Indicators Module** ✅
-- SMA, RSI, Momentum calculations
-- Vectorized computations
-- Cost: $1.00
+### Session 3: Indicators Module
+- SMA, RSI, Momentum with abstract base class (`modules/indicators/`)
+- All use lowercase column names: `close`
 
-### **Session 4: Strategy Module** ✅
-- Entry/exit logic
-- Signal generation
-- Position management
-- Cost: $1.00
+### Session 4: Strategy Module
+- Strategy ABC + MARSIMomentumStrategy (`modules/strategy/`)
+- SMA crossover + RSI filter + Momentum filter
+- Signals: 1=BUY, -1=SELL, 0=HOLD | Positions forward-fill
 
-### **Session 5B: Backtesting (Corrected)** ✅
-- Fixed equity tracking bug
-- Proper position management
-- Performance metrics
-- Cost: $1.75 (includes 5A failure)
+### Session 5/5B: Backtesting
+- BacktestEngine, TransactionCosts, metrics (`modules/backtest/`)
+- Signal at bar t → execute at bar t+1 open (no look-ahead bias)
+- Fixed equity tracking bug in 5B
 
-### **Session 6B: Optimization (Corrected)** ✅
-- Grid search over parameter space
-- Found optimal parameters: SMA(15/70), RSI(14, 35/75), Momentum(10, 0.0)
-- Position size validation: 20K EUR (linear scaling confirmed)
-- **Results:** Sharpe 4.59, Return 8.25%, Max DD -1.06%
-- Cost: $2.25 (includes 6A failure)
+### Session 6/6B: Optimization
+- GridSearchOptimizer, OptimizationResults (`modules/optimization/`)
+- 432 parameter combinations for 5min and 4H
+- Discovered linear scaling property (Sharpe invariant to position size)
 
-### **Session 7: Live Trading Bot** ✅
-- Object-oriented architecture
-- Real-time price fetching
-- Signal generation and execution
-- Docker deployment
-- Cost: $1.50
+### Session 7: Live Trading Bot + Docker
+- LiveTradingBot class (`deployment/trading_bot.py`)
+- Forex("EURUSD") contract via ib_async
+- Docker deployment, config_live.py with optimized params
+- Time-based runtime, weekend closing, trade CSV logging
 
-### **Session 7B: Reconnection Logic** ✅
-- Handles IB Gateway midnight reboots
-- Exponential backoff (1s → 512s)
-- Automatic recovery
-- Cost: $0.33
+### Session 7B: Reconnection Logic
+- Exponential backoff (1s → 2s → 4s → ... → 60s cap)
+- Handles IB Gateway midnight reboots (2-5 min downtime)
 
-### **Session 7C: Position Reconciliation** ✅
-- Syncs bot state with IB reality
-- Prevents double position errors
-- Handles disconnect scenarios
-- Cost: $0.33
+### Session 7C: Position Reconciliation
+- `reconcile_positions()` syncs bot state with IB reality after reconnect
+- Contract matching via `pair()` method with symbol/currency fallback
+- Entry price from IB: `abs(avgCost)` (per-unit rate for forex)
 
-### **Session 7D: Bug Fixes (Partial)** ✅
-- Fixed event loop issues with `qualifyContractsAsync()`
-- Removed problematic `await self.ib.sleep()` calls
-- Contract qualification working
-- **Note:** Some issues persist (see Critical Bugs)
-- Cost: $0.67
+### Session 7D: Contract Fixes
+- `qualifyContractsAsync()` (async, not sync)
+- Removed problematic `self.ib.sleep()` calls
 
-**Total Sessions Cost:** $11.58
+### Session 7E: Critical Production Fixes (8 bugs fixed)
+- All orders use `order.tif = 'GTC'` (forex 24/5, DAY caused Error 10349)
+- Proper fill waiting: 30s timeout loop with `trade.isDone()`
+- Entry price from `trade.orderStatus.avgFillPrice`
+- `close_position()` returns bool; double-position guard in `execute_order()`
+- EUR balance verification (`check_eur_balance()`, MIN_EUR_BALANCE = 20000)
+- `load_historical_warmup()`: ~80 bars in ~4 seconds on startup
+- `fetch_latest_bar()`: proper 5-min bar streaming via `reqHistoricalData`
+- Bar deduplication via `self.last_bar_time`
+- P&L logging in EUR and USD
 
----
+### Session 7F: Reconciliation P&L Tracking
+- `_record_reconcile_close()`: records estimated P&L when position vanishes
+- Uses last known price as exit estimate
 
-## 🚀 Live Deployment Success (4-Hour Test)
+### Session 7G: Entry Price Fix
+- IB's `avgCost` for forex is already the per-unit exchange rate
+- Fixed: `abs(avgCost)` instead of `avgCost / position_size`
 
-**Test Run:** February 12-13, 2026 (23:35 - 03:35 UTC)  
-**Duration:** 4 hours, 12 seconds  
-**Outcome:** Bot ran autonomously with trades executed
+### Session 7H: Connectivity Reconciliation
+- Error 1102 handler (`_on_error()`) sets `_needs_reconciliation` flag
+- Main loop checks flag and runs `reconcile_positions()`
+- Pre-trade IB position verification (`_get_ib_eur_position()`)
+- Prevents stale state from "soft" connectivity losses
 
-### **What Worked:**
-✅ 4-hour autonomous operation  
-✅ Automatic reconnection after disconnect (23:45 - successful!)  
-✅ Position reconciliation after reconnect  
-✅ Contract qualification (conId: 12087792)  
-✅ Signal generation after 70 bars  
-✅ 4 trades executed  
-✅ Final close-out before shutdown  
-
-### **Performance:**
-- Total Trades: 4
-- Win Rate: 0% (all losses - expected in low-volatility period)
-- Total P&L: -$39.70 (from $20K capital = -0.2%)
-- Bars Collected: 120
-- No crashes or fatal errors
+### Session 8A: Initial Capital Correction
+- Corrected initial_capital from 10,000 to 20,000 EUR (no leverage)
+- Proved mathematical scaling insufficient (Sharpe, drawdown are non-linear)
+- Full grid search re-run with `scripts/regenerate_results_20k.py`
+- Moved CSV files to `data/backtest/` and `data/optimization/`
+- Updated notebook section 6 and all project documentation
 
 ---
 
-## 🚨 Critical Bugs Discovered (Need Session 7E)
+## Optimized Strategy Parameters (Session 8A — corrected)
 
-### **Bug #1: Order TIF Error** ⚠️
-**Issue:** Every order generates "Error 10349: Order TIF was set to DAY"  
-**Impact:** Orders still execute but with warnings  
-**Cause:** Missing `order.tif = 'GTC'` for 24/5 forex markets  
-**Fix:** 1-line addition per order
+Initial capital: 20,000 EUR. Position size: 20,000 EUR. No leverage (1:1).
 
-### **Bug #2: Double Position** 🔴 CRITICAL
-**Issue:** Bot opened SHORT position twice (-40K EUR instead of -20K)  
-**Impact:** IBKR forex constraint violation, wrong position size  
-**Cause:** Close and open orders execute simultaneously without confirmation wait  
-**Fix:** Implement old bot's wait-for-confirmation logic
+| Timeframe | SMA Fast/Slow | RSI Lower/Upper | Mom Threshold | Sharpe | Return | Trades |
+|-----------|---------------|-----------------|---------------|--------|--------|--------|
+| 5min      | 15 / 70       | 35 / 75         | 0.0           | 4.55   | +4.13% | 107    |
+| 4H        | 20 / 70       | 35 / 70         | 0.0           | 1.42   | +30.23%| 45     |
 
-### **Bug #3: Entry Price Not Set** 🔴
-**Issue:** P&L shows $0.00 during position, only correct at close  
-**Impact:** Position monitoring broken, can't track unrealized P&L  
-**Cause:** `entry_price` not set from fill confirmation  
-**Fix:** Set `entry_price = trade.orderStatus.avgFillPrice`
-
-### **Bug #4: Currency Leverage Error** 🔴
-**Issue:** "Error 201: FX trade would expose account to currency leverage"  
-**Impact:** First order rejected (but somehow filled anyway?)  
-**Cause:** EUR account, no balance verification before trading  
-**Fix:** Implement EUR balance check from old bot
-
-### **Bug #5: Wrong Timeframe Data** 🔴
-**Issue:** Bot fetches 60-second spot prices, not 5-minute bars  
-**Impact:** Strategy behavior differs from backtest (which used 5-min bars)  
-**Cause:** Design flaw - using `fetch_latest_price()` every 60s  
-**Fix:** Use `reqHistoricalData()` for proper 5-minute OHLC bars
-
-### **Bug #6: No Historical Warmup** ⚠️
-**Issue:** Bot needs 70 minutes to collect 70 bars before first signal  
-**Impact:** Wastes time, can't trade immediately  
-**Cause:** No historical data fetch on startup  
-**Fix:** Fetch 70+ bars from `reqHistoricalData()` before starting
+Optimal parameters are identical across all position size/capital combinations.
 
 ---
 
-## 🔄 Architectural Issues
+## Live Testing Results
 
-### **Async vs Sync Conflict**
-**Old Bot:** Synchronous (`self.ib.sleep()`)  
-**New Bot:** Async/await architecture (`await asyncio.sleep()`)  
-**Issue:** Mixing patterns causes event loop errors  
-**Resolution:** Commit fully to async pattern with `ib_async` library
+### 4-Hour Test (Feb 12-13, 2026)
+- First autonomous run after Session 7D
+- 4 trades, all losses (low-volatility period)
+- P&L: -$39.70 (-0.2%) — acceptable for validation
+- Successful reconnection after IB Gateway disconnect
+- Revealed 8 bugs → fixed in Session 7E
 
-### **Old Bot Reference Files**
-Uploaded working bot from previous project:
-- `position_manager.py` - Has correct TIF, entry_price, wait logic
-- `live_trader.py` - Simple synchronous approach
-- These show best practices for order execution and balance checks
+### 3-Day Test (Feb 18-20, 2026, post-7E fixes)
+- Duration: ~3 days (5min timeframe)
+- Bot ran autonomously through multiple IB Gateway daily resets
+- Midnight reboot (Error 1100 → reconnect → reconcile): handled correctly
+- Soft connectivity blip: revealed stale state issue → fixed in Session 7H
+- Order rejection from stale state: root cause identified → fixed in Session 7H
 
 ---
 
-## 📁 Current File Structure
+## Notebook Progress
 
-### **On Droplet** (157.230.113.17)
+Notebook content is being written as markdown files in
+`migration/03-final-deliverable/04-claude-code-files/` (gitignored, managed separately).
+
+| Section | Status | File |
+|---------|--------|------|
+| 1. Introduction | Written | `section-01-introduction.md` |
+| 2. Project Setup | Written | `section-02-project-setup.md` |
+| 3. Data Acquisition | Written | `section-03-data-acquisition.md` |
+| 4. Technical Indicators | Written | `section-04-technical-indicators.md` |
+| 5. Signal Generation | Written | `section-05-signal-generation.md` |
+| 6. Backtest & Optimization | Written | `section-06-backtest-implementation.md` |
+| 7. Live Trading | Pending | — |
+| 8. (reserved) | — | — |
+| 9. Results & Analysis | Pending | Needs live trading data |
+| 10. Conclusion | Pending | — |
+| Abstract | Pending | — |
+
+---
+
+## Planned (Not Yet Implemented)
+
+### Error 1100 Backend Disconnect Pause Flag
+- Add `is_backend_connected` flag to `_on_error()` in `trading_bot.py`
+- Pause main loop between Error 1100 (IB daily reset) and Error 1102 (restored)
+- ~10 lines of code, documented in Session 8A handoff
+- Benefits: clean logs, no order attempts during reset, good for CPF report
+- To be implemented when bot code is next modified
+
+---
+
+## Project File Structure
+
 ```
-/root/trading_bot/
+CPF-Final-Project/
+├── modules/
+│   ├── config/        # Constants, timeframe configs, validation
+│   ├── data/          # CSV loader, validation, datetime indexing
+│   ├── indicators/    # SMA, RSI, Momentum (abstract base class)
+│   ├── strategy/      # Strategy ABC + MARSIMomentumStrategy
+│   ├── backtest/      # BacktestEngine, TransactionCosts, metrics
+│   └── optimization/  # GridSearchOptimizer, OptimizationResults
 ├── deployment/
-│   ├── trading_bot.py          # Main bot (NEEDS FIXES)
-│   ├── config_live.py          # Configuration
-│   ├── Dockerfile
+│   ├── trading_bot.py # Live trading bot (async, ib_async) — Session 7H
+│   ├── config_live.py # Runtime config + optimized params
+│   ├── Dockerfile     # Build context is project root
 │   ├── requirements.txt
-│   └── logs/                   # Log files with timestamps
-└── modules/
-    ├── config/, data/, indicators/
-    ├── strategy/, backtest/, optimization/
+│   ├── .dockerignore
+│   └── logs/          # Runtime output (gitignored)
+├── scripts/
+│   ├── fetch_historical_data.py   # IB Gateway historical fetch
+│   └── regenerate_results_20k.py  # Session 8A CSV regeneration
+├── data/
+│   ├── historical/    # CSV data: {5min,4H,1D}/
+│   ├── backtest/      # Backtest result CSVs
+│   └── optimization/  # Optimization result CSVs
+├── docs/
+│   ├── handoffs/      # Session handoff documents (1 through 8A)
+│   ├── specifications/# Session specification documents
+│   └── project-progress.md  # This file
+├── notebooks/         # Jupyter analysis (pending)
+└── tests/             # Unit tests
 ```
 
-### **Local Development**
-```
-~/Projects/.../CPF-Final-Project/
-├── deployment/                 # Same as droplet
-├── modules/                    # Core modules
-├── notebooks/                  # Jupyter analysis
-└── tests/                      # Unit tests
-```
-
 ---
 
-## 🎯 Next Steps (Session 7E)
+## Technical Environment
 
-### **Priority 1: Critical Safety Fixes** 🔴
-1. Fix double position bug (wait for confirmation)
-2. Add EUR account balance check
-3. Set `entry_price` from fill confirmation
-4. Add `order.tif = 'GTC'`
-
-### **Priority 2: Data Architecture** 🟡
-5. Implement 5-minute bar streaming (not 60s prices)
-6. Add historical data warmup (70 bars on startup)
-7. Align timeframe with backtest methodology
-
-### **Priority 3: Improvements** 🟢
-8. Better logfile naming (timeframe + timestamp)
-9. Track P&L in EUR (account currency)
-10. Improved error handling for rejected orders
-
-### **Testing Strategy**
-- Test locally first (SSH tunnel or direct connection)
-- No Docker rebuilds during debugging
-- Deploy to Docker only when stable
-- Run 1-hour validation test
-- Then multi-day production run
-
----
-
-## 💰 Budget & Timeline
-
-### **Budget Status**
-- Used: $11.58 (46%)
-- Remaining: $13.42 (54%)
-- Session 7E estimate: $2-3
-- Final testing: $1-2
-- **Total projected:** ~$15-16 (well under budget)
-
-### **Timeline**
-- Today: Feb 13, 2026
-- Deadline: Mar 31, 2026
-- **Remaining:** 46 days (6.5 weeks)
-- Session 7E: 1-2 days
-- Testing: 3-5 days
-- Session 8 (Notebook integration): 2-3 days
-- **Buffer:** 5+ weeks for additional iterations
-
-**Status:** Ahead of schedule, under budget ✅
-
----
-
-## 📝 Academic Justification Points
-
-### **Position Reconciliation (7C)**
-"Position state reconciliation addresses a critical gap in distributed system state management. When the bot's internal state diverges from the broker's actual state, trading decisions become incorrect. This occurs during disconnections when positions are closed by stop-losses, margin calls, or manual intervention. The reconciliation pattern queries authoritative state after reconnection and updates local state to match reality."
-
-### **Reconnection Logic (7B)**
-"Exponential backoff with 10 retry attempts handles IB Gateway's scheduled midnight reboots gracefully. The 4-hour live test confirmed successful automatic reconnection and position state verification after network interruption."
-
-### **Optimization Results (6B)**
-"Grid search revealed SMA(15/70) with RSI(14, 35/75) as optimal parameters, achieving Sharpe ratio 4.59 and 8.25% return. Position size validation at 20K EUR confirmed linear scaling - doubling position size doubled returns while maintaining identical Sharpe ratio."
-
-### **Deployment Learning (7D)**
-"Deployment testing revealed issues invisible during specification: event loop conflicts, contract qualification timing, and the critical distinction between synchronous and asynchronous patterns in Python. This demonstrates the value of early deployment with real-environment feedback."
-
----
-
-## 🔧 Technical Environment
-
-### **DigitalOcean Droplet**
+### DigitalOcean Droplet
 - IP: 157.230.113.17
 - OS: Ubuntu 22.04.5 LTS
-- IB Gateway: Running, confirmed active
-- Docker: Trading bot containerized
-- Network: Configured for IB API access
+- IB Gateway: Running, paper trading port 4002
+- Docker: Trading bot containerized (`--network host`)
 
-### **Dependencies**
+### Dependencies
 - Python 3.11
-- ib_async library (async variant of ib_insync)
+- ib_async v2.1.0 (async IB API)
 - pandas, numpy for data processing
 - Docker for containerization
 
-### **Access**
-```bash
-ssh root@157.230.113.17
-# IB Gateway accessible at localhost:4002 (paper trading)
-```
+### Key IB Patterns (learned from production bugs)
+- Contract: `Forex("EURUSD")`, qualify with `qualifyContractsAsync()`
+- Orders: `order.tif = "GTC"` (not DAY), wait for fill with `trade.isDone()`
+- Entry price: `trade.orderStatus.avgFillPrice` (not current price)
+- IB `avgCost` for forex: already per-unit rate (`abs(avgCost)`)
+- Account data: `accountSummaryAsync()` (async, not sync)
+- Historical data: `reqHistoricalDataAsync()` (not `reqMktData`)
 
 ---
 
-## 📄 Related Documents
+## Next Steps
 
-- `session-7E-specification.md` - Detailed fixes for next session
-- `deployment-status.md` - Current deployment configuration
-- `critical-bugs-analysis.md` - Deep dive on bugs discovered
-- Previous session specs in `/mnt/user-data/outputs/`
-
----
-
-## 🎓 Project Assessment
-
-**Strengths:**
-- Systematic approach from data to deployment
-- Proper optimization with validated results
-- Successful live deployment with reconnection handling
-- Good documentation and reproducibility
-
-**Learning Outcomes:**
-- Discovered async/sync architecture considerations
-- Learned importance of early deployment testing
-- Understood broker-specific constraints (TIF, currency leverage)
-- Experienced real-world vs backtest differences
-
-**Next Phase:**
-Session 7E will address critical bugs and establish production-ready bot for extended live testing period before academic deadline.
+1. **Implement Error 1100 pause flag** (~10 lines, next bot modification)
+2. **Production 5min test run** (Mon-Fri, 5 days)
+3. **Production 4H test run** (following week, 5 days)
+4. **Write notebook sections 7, 9, 10, Abstract** (after live trading data available)
+5. **Final notebook assembly** in Jupyter
 
 ---
 
-**Last Updated:** February 13, 2026, 08:40 UTC  
-**Next Action:** Review Session 7E specification and begin implementation
+## Key Documents
+
+| Document | Location |
+|----------|----------|
+| Project instructions | `CLAUDE.md` (project root) |
+| Session handoffs | `docs/handoffs/session-XX-description.md` |
+| Session specifications | `docs/specifications/spec-XXX-description.md` |
+| Deployment guide | `deployment/DEPLOYMENT_GUIDE.md` |
+| Notebook sections | `migration/03-final-deliverable/04-claude-code-files/` (gitignored) |
+
+---
+
+**Last Updated:** February 21, 2026
+**Next Action:** Implement Error 1100 pause flag, then begin production 5min test run
