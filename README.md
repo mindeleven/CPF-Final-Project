@@ -198,7 +198,7 @@ pip install -r requirements.txt
 
 # For cloud deployment
 # Edit deployment/config_live.py:
-# HOST = '157.230.113.17'  # Your droplet IP
+# HOST = 'XXX.XXX.XXX.XX'  # Your droplet IP
 # PORT = 4002
 ```
 
@@ -246,7 +246,7 @@ See `deployment/DEPLOYMENT_GUIDE.md` for complete cloud deployment instructions.
 **Quick cloud deployment:**
 ```bash
 # SSH into droplet
-ssh root@157.230.113.17
+ssh root@XXX.XXX.XXX.XX
 
 # Navigate to project
 cd /path/to/CPF-Final-Project/deployment
@@ -428,7 +428,7 @@ MAX_POSITION_SIZE = 20000
 ```python
 # Connection Settings
 HOST = '127.0.0.1'      # localhost for local testing
-# HOST = '157.230.113.17'  # DigitalOcean droplet IP for cloud deployment
+# HOST = 'XXX.XXX.XXX.XX'  # DigitalOcean droplet IP for cloud deployment
 PORT = 4002             # 4002 for IB Gateway paper trading
 CLIENT_ID = 1           # Unique client identifier
 ```
@@ -777,7 +777,7 @@ pytest>=7.4.0
 - **Docker Compose:** Version 2.0+
 
 **Current Production Environment:**
-- Droplet IP: 157.230.113.17 (Frankfurt datacenter)
+- Droplet IP: XXX.XXX.XXX.XX (Frankfurt datacenter)
 - IB Gateway: Running in Docker container
 - Trading bot: Containerized with `--network host`
 
