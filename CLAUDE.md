@@ -124,7 +124,7 @@ Initial capital: 20,000 EUR. Position size: 20,000 EUR. No leverage (1:1).
 | Timeframe | SMA Fast/Slow | RSI Period | RSI Lower/Upper | Mom Period | Mom Threshold | Sharpe | Return | Trades |
 |-----------|---------------|------------|-----------------|------------|---------------|--------|--------|--------|
 | 5min | 15 / 70 | 14 | 35 / 75 | 10 | 0.0 | 4.55 | +4.13% | 107 |
-| 4H | 20 / 70 | 21 | 35 / 70 | 14 | 0.0 | 1.42 | +30.23% | 45 |
+| 4H | 20 / 70 | 14 | 35 / 70 | 10 | 0.0 | 1.42 | +30.23% | 45 |
 
 CSV files: `data/optimization/optimization_results_{5min,4H}_corrected.csv`
 
