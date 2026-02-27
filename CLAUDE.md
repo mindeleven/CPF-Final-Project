@@ -227,4 +227,54 @@ run()
 | 7G | Entry price fix | avgCost is per-unit for forex, not total cost |
 | 7H | Connectivity reconciliation | Reconcile on Error 1102 + pre-trade IB position verify |
 | 8A | Initial capital correction | 20K initial capital, regenerated all CSVs, updated notebook |
-| 8 | Notebook integration | **PENDING** |
+
+---
+
+## Notebook Status (as of 2026-02-27)
+
+Current state: `migration/03-final-deliverable/03b-current-nb-20260227/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
+- Total: 4,936 lines, 10 main sections + Abstract + References
+
+### Section Structure
+
+| Section | Title | Status | Key Content |
+|---------|-------|--------|-------------|
+| Abstract | — | Placeholder | Awaiting live results ([X]% return, Sharpe [X]) |
+| 1 | Project Setup | Complete | IBKR selection, DigitalOcean setup, Docker, IB Gateway deployment, VNC config |
+| 2 | Strategic Decisions | Complete | EUR/USD rationale, timeframe selection, MA/RSI/Momentum parameter reasoning |
+| 3 | Data Preparation | Complete | Load 3 timeframes, visualizations, quality checks |
+| 4 | Technical Indicator Calculation | Complete | SMA, RSI, Momentum implementation + validation |
+| 5 | Signal Generation and Position Management | Complete | Strategy logic, signal→position conversion, validation |
+| 6 | Backtest Implementation | Complete | Results tables, heatmaps, optimal params (SMA 15/70, 20/70) |
+| 7 | Live Trading Implementation | Complete | Requirements, architecture, challenges (8 bugs), testing history |
+| 8 | Cloud Deployment | Complete | Docker containerization, deployment process, monitoring, lifecycle mgmt |
+| 9 | Results from Cloud Trading Run | **PENDING** | 9.1 has placeholder text, 9.2-9.3 empty |
+| 10 | Conclusion | **PENDING** | All subsections empty (10.1-10.5) |
+| References | — | Complete | 16 sources (academic + practitioner) |
+
+### Section 9 Placeholders (awaiting live data)
+
+**9.1 Test Period Specification:**
+- Shows Feb 23-28 for 5min, Mar 1-5 for 4H (dates are placeholders)
+- Infrastructure events placeholder: "[N] scheduled IB Gateway infrastructure events"
+
+**9.2 Performance Summary:** Empty (needs trade CSV analysis)
+
+**9.3 Lessons Learned:** Empty (needs reflection on live run vs backtest)
+
+### Section 10 Structure (all empty)
+
+- 10.1 Key Achievements
+- 10.2 Strategy Performance Analysis
+- 10.3 Technical Lessons Learned
+- 10.4 Future Directions (has one bullet point on Sortino ratio as placeholder)
+- 10.5 Final Reflections
+
+### Key Parameters Confirmed
+
+**Optimization results shown in Section 6:**
+- 5min: SMA 15/70, RSI 14 (35/75), Momentum 10 (0.0) → Sharpe 4.55, +4.13%, 107 trades
+- 4H: SMA 20/70, RSI 14 (35/70), Momentum 10 (0.0) → Sharpe 1.42, +30.23%, 45 trades
+- Both use config defaults: `rsi_period=14, momentum_period=10`
+
+**Critical note:** Section 6 optimization tables and heatmaps show correct Sharpe values (4.55/1.42). The earlier Sharpe discrepancy (0.37 vs 1.42 for 4H) was resolved by fixing wrong RSI/Momentum periods in CLAUDE.md table.
