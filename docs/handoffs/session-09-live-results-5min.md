@@ -121,36 +121,53 @@ The first Error 201 occurred at 03:31:03 CET, immediately after:
 - Order status: PendingSubmit → Inactive
 - Fill timeout after 30 seconds (order never filled)
 
-**Root cause hypothesis:**
+**Root cause analysis:**
 
-Error 201 indicates IB detected that the trade would create currency leverage in the account. This suggests the EUR cash balance may have been insufficient at the moment of execution, despite passing the pre-trade balance check seconds earlier. Possible causes:
+Error 201 indicates IB detected that the trade would create currency leverage in the account. Upon investigation, the root cause is:
 
-1. **Timing issue:** Balance check runs before order submission, but by the time IB processes the order, available EUR has changed (e.g., margin requirements updated, another process consumed EUR).
+**The bot checks EUR balance but the order requires USD.**
 
-2. **IB balance calculation difference:** The bot queries `TotalCashBalance` for EUR, but IB's leverage check may use a different metric (e.g., `AvailableFunds`, `BuyingPower`) that accounts for margin requirements differently.
+EUR.USD forex order semantics:
+- **BUY EUR.USD** = buy 20,000 EUR base currency using USD quote currency (~23,600 USD needed at 1.18 rate)
+- **SELL EUR.USD** = sell 20,000 EUR base currency receiving USD quote currency (~23,600 USD received)
 
-3. **Paper trading account simulation:** Paper accounts may enforce stricter leverage rules than expected, or the simulation's balance state may lag real-time.
+Log evidence (Feb 27 at 03:31:02):
+```
+EUR balance: 1,002,208.14 EUR  ← Bot checks this (sufficient)
+Order: BUY 20,000 EUR.USD      ← Requires USD (insufficient)
+Result: Error 201               ← IB rejects due to lack of USD
+```
+
+**The bot's `check_eur_balance()` method only verifies EUR balance, which is correct for SELL orders but incorrect for BUY orders.** The paper trading account is EUR-denominated (~1M EUR) with insufficient USD, causing all BUY orders to fail with Error 201.
+
+**Verification from previous project:**
+
+The previous project (located at `migration/02-trading-bot-development/reference-files/trading-bot-previous-project/ibkr_live_trading/position_manager.py`) correctly implemented `check_usd_balance()` method that checks USD balance before trading. This confirms the current bot's implementation is missing currency-aware balance checking.
 
 **Impact:**
 
-- 3 trades failed to execute (out of ~11 attempted)
+- 3 BUY trades failed to execute (out of 14 attempted trades total)
 - Bot continued running after each rejection (no crash)
 - Fill timeout mechanism correctly detected non-fill and aborted position update
+- SELL trades unaffected (bot correctly checks EUR for those)
 
 **Recommended fix for 4H test run (March 2):**
 
-1. **Short-term (before Monday):** Increase `MIN_EUR_BALANCE` threshold from 20,000 to 25,000 EUR in `config_live.py`. This provides a safety buffer between the balance check and IB's leverage calculation.
+**Option 1 (Immediate — RECOMMENDED):** Manual currency conversion via IB Gateway
+- Convert 500,000 EUR to USD (~590,000 USD at current rates) via IB Gateway currency converter
+- This provides balanced holdings: ~500K EUR + ~590K USD
+- Sufficient for ~25 SELL trades (EUR) and ~24 BUY trades (USD)
+- Timeline: Execute this weekend (Feb 28-Mar 1) before Monday's market open
+- No code changes required
+- **Full instructions:** See `docs/ib-currency-conversion-guide.md`
 
-2. **Medium-term:** Replace `TotalCashBalance` query with `AvailableFunds` or `BuyingPower` query in the `check_eur_balance()` method. These metrics account for margin requirements and provide a more conservative balance estimate.
+**Option 2 (Long-term):** Implement direction-aware balance checking in bot code
+- Add `check_usd_balance()` method (following previous project's implementation)
+- Modify `execute_order()` to check USD for BUY signals, EUR for SELL signals
+- Requires code changes + Docker rebuild
+- Better for production, but not needed if Option 1 is implemented
 
-3. **Long-term:** Add explicit handling for Error 201:
-   ```python
-   if errorCode == 201:
-       self.logger.error("Error 201: Currency leverage limit. Insufficient EUR balance.")
-       # Skip this trade attempt, wait for next signal
-   ```
-
-**Feasibility for 4H test:** Fix #1 (increase MIN_EUR_BALANCE) can be implemented in 30 seconds by editing `config_live.py`. Fix #2 (change balance query) requires modifying `check_eur_balance()` in `trading_bot.py` and rebuilding the Docker image (~5 minutes). Both are feasible before Monday.
+**Feasibility for 4H test:** Option 1 (manual conversion) can be completed in 10-15 minutes this weekend. No code deployment needed.
 
 ### Fill Timeouts
 
@@ -289,8 +306,9 @@ All three Error 201 events occurred on the same day (Thursday, Feb 27), suggesti
 - 3 order rejections (Error 201) — bot continued operating without crash
 
 **Critical issue:**
-- 3 trades failed with Error 201 (currency leverage limit) on Feb 27
-- Recommended fix: Increase MIN_EUR_BALANCE to 25,000 EUR
+- 3 BUY trades failed with Error 201 (currency leverage limit) on Feb 27
+- Root cause: Bot checks EUR balance but BUY orders require USD
+- Recommended fix: Convert 500K EUR to USD via IB Gateway before Monday's 4H test (see `docs/ib-currency-conversion-guide.md`)
 
 ### Section 9.3 (Lessons Learned)
 
@@ -300,7 +318,7 @@ All three Error 201 events occurred on the same day (Thursday, Feb 27), suggesti
 
 3. **Infrastructure is robust:** Nightly reconnection + reconciliation logic worked flawlessly across 4 reset cycles.
 
-4. **Balance check timing issue:** Pre-trade balance verification passed, but IB rejected orders with Error 201 seconds later. This suggests IB's leverage calculation differs from our balance query. Fix: increase MIN_EUR_BALANCE buffer or query `AvailableFunds` instead of `TotalCashBalance`.
+4. **Currency-aware balance checking:** Bot's `check_eur_balance()` is correct for SELL orders (which require EUR) but incorrect for BUY orders (which require USD). BUY EUR.USD means "buy EUR with USD", requiring USD balance. The EUR-denominated account (~1M EUR, insufficient USD) caused all BUY orders to fail with Error 201. Fix: Manual currency conversion (500K EUR → USD) before next test, or implement direction-aware balance checking in code (check USD for BUY, EUR for SELL).
 
 5. **Paper trading quirks:** IB paper accounts may close positions during nightly resets (not typical of live accounts). This explains high reconciliation-close rate.
 
