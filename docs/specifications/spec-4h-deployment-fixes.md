@@ -138,6 +138,72 @@ RUN_DURATION = "5d"   # Was: "1h"
 
 ---
 
+## Issue 3: Baseline Position Snapshot
+
+**Location:** `deployment/trading_bot.py` (added March 2, 2026)
+
+**Problem:**
+When the user performs manual EUR→USD currency conversion via IB Gateway (as recommended to fix Error 201 issues), the conversion may create positions visible to the bot's reconciliation logic. The bot could mistakenly interpret these pre-existing positions as trading positions that need to be managed or closed, leading to unintended trades or state corruption.
+
+**Solution:**
+Add a baseline position snapshot feature that captures all existing positions at startup, before any reconciliation or trading begins. The bot then filters out these baseline positions from all position queries, ensuring it only acts on positions it creates itself.
+
+**Implementation:**
+
+1. **In `__init__` (line 112):** Add `self.baseline_positions: set = set()`
+
+2. **At startup (lines 1096-1102), after capital is set and before reconciliation:**
+```python
+# Capture baseline positions (e.g., from EUR→USD conversion)
+existing = await self.ib.reqPositionsAsync()
+self.baseline_positions = {
+    (p.contract.symbol, p.contract.currency, round(p.position))
+    for p in existing
+}
+self.logger.info(f"Baseline positions at startup: {self.baseline_positions}")
+```
+
+3. **In `reconcile_positions()` (lines 263-268):** Filter positions before reconciliation logic:
+```python
+# positions() is synchronous — returns complete list immediately
+# Filter out baseline positions (e.g., EUR→USD conversion)
+positions = [
+    p for p in self.ib.positions()
+    if (p.contract.symbol, p.contract.currency, round(p.position))
+    not in self.baseline_positions
+]
+```
+
+4. **In `_get_ib_eur_position()` (lines 422-427):** Filter positions before checking EUR/USD position:
+```python
+# Filter out baseline positions (e.g., EUR→USD conversion)
+positions = [
+    p for p in self.ib.positions()
+    if (p.contract.symbol, p.contract.currency, round(p.position))
+    not in self.baseline_positions
+]
+```
+
+**Key design choices:**
+- Tuple format `(symbol, currency, round(position))` uniquely identifies a position
+- `round(position)` handles floating-point precision issues in position size matching
+- Set lookup is O(1) for efficient filtering
+- Snapshot taken early (after connect, before reconciliation) to capture true baseline
+- Filtering applied in ALL position query locations for consistency
+
+**Behavior:**
+- If no pre-existing positions at startup: `baseline_positions = set()` (empty), no filtering effect
+- If EUR→USD conversion position exists: Position is added to baseline set and ignored by all reconciliation logic
+- Bot only sees and acts on positions it opens via `execute_order()`
+
+**Risk mitigation:**
+- Contained change: only 3 locations modified (init, reconcile, pre-trade check)
+- No behavior change if account starts clean (current state)
+- Activates only when conversion positions are present
+- Log statement confirms baseline at startup for debugging
+
+---
+
 ## Verification Method
 
 **No local testing possible:**
@@ -191,6 +257,10 @@ Fetching latest 5-minute bar...
 
 2. `deployment/trading_bot.py`
    - Import section: Add TIMEFRAME_CONFIGS, get_timeframe_config
+   - `__init__()` method: Add baseline_positions set (line 112)
+   - `run()` method: Populate baseline_positions at startup (lines 1096-1102)
+   - `reconcile_positions()` method: Filter baseline positions (lines 263-268)
+   - `_get_ib_eur_position()` method: Filter baseline positions (lines 422-427)
    - `load_historical_warmup()` method: Dynamic bar size and duration
    - `fetch_latest_bar()` method: Dynamic bar size and duration
 

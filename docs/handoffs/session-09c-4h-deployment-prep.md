@@ -1,6 +1,6 @@
 # Session 09C: 4H Live Trading Deployment Preparation
 
-**Date:** March 1, 2026 (Saturday)
+**Date:** March 1-2, 2026 (Saturday-Sunday)
 **Model:** Claude Opus 4.6
 **Status:** Complete — Ready for Monday deployment
 **Next session:** Monday, March 2, 2026 (4H live run starts)
@@ -9,10 +9,11 @@
 
 ## Summary
 
-Fixed three critical bugs preventing 4H live trading:
+Fixed four critical issues preventing 4H live trading:
 1. **Wrong strategy parameters** in `config_live.py` (RSI_PERIOD=21, MOMENTUM_PERIOD=14 should be 14, 10)
 2. **Hardcoded 5-minute bar size strings** in `trading_bot.py` (two methods affected)
 3. **Configuration values** for 4H run (TIMEFRAME, RUN_DURATION)
+4. **Baseline position snapshot** to ignore pre-existing currency conversion positions (added March 2)
 
 All fixes verified by code review. No local testing possible (market closed, Docker build on server only).
 
@@ -66,6 +67,57 @@ from modules.config import get_timeframe_config
 ```
 
 This import provides access to `TIMEFRAME_CONFIGS` dictionary with correct IB bar size strings.
+
+#### Baseline Position Snapshot (added March 2)
+
+**Purpose:** Prevent reconciliation logic from confusing pre-existing currency conversion positions with trading positions.
+
+**Changes:**
+
+1. **__init__ method (line 112):** Added baseline position set
+```python
+# Baseline positions — snapshot at startup to ignore pre-existing positions
+self.baseline_positions: set = set()
+```
+
+2. **run() method startup (lines 1096-1102):** Populate baseline at startup (after capital set, before reconciliation)
+```python
+# Capture baseline positions (e.g., from EUR→USD conversion)
+existing = await self.ib.reqPositionsAsync()
+self.baseline_positions = {
+    (p.contract.symbol, p.contract.currency, round(p.position))
+    for p in existing
+}
+self.logger.info(f"Baseline positions at startup: {self.baseline_positions}")
+```
+
+3. **reconcile_positions() method (lines 263-268):** Filter out baseline before reconciliation
+```python
+# positions() is synchronous — returns complete list immediately
+# Filter out baseline positions (e.g., EUR→USD conversion)
+positions = [
+    p for p in self.ib.positions()
+    if (p.contract.symbol, p.contract.currency, round(p.position))
+    not in self.baseline_positions
+]
+```
+
+4. **_get_ib_eur_position() method (lines 422-427):** Filter out baseline before pre-trade check
+```python
+# Filter out baseline positions (e.g., EUR→USD conversion)
+positions = [
+    p for p in self.ib.positions()
+    if (p.contract.symbol, p.contract.currency, round(p.position))
+    not in self.baseline_positions
+]
+```
+
+**Behavior:**
+- If no pre-existing positions at startup: `baseline_positions = set()` (empty), no filtering effect — identical to current behavior
+- If EUR→USD conversion position exists: Position ignored by reconciliation and pre-trade checks
+- Bot only sees and manages positions it creates via `execute_order()`
+
+**Risk:** Contained change, activates only when conversion positions present, no impact if account starts clean.
 
 #### load_historical_warmup() Method (lines 534-594)
 
@@ -213,9 +265,20 @@ bars = await self.ib.reqHistoricalDataAsync(
    Checking EUR balance...
    EUR balance: XXX,XXX.XX EUR
    Status: Sufficient
+   Capital set from account: XXX,XXX.XX EUR
    ```
 
-3. **Position Reconciliation:**
+3. **Baseline Position Snapshot:**
+   ```
+   Baseline positions at startup: set()
+   ```
+
+   **Or, if EUR→USD conversion exists:**
+   ```
+   Baseline positions at startup: {('EUR', 'USD', 500000)}
+   ```
+
+4. **Position Reconciliation:**
    ```
    Reconciling position state with IB...
    IB position: 0 EUR (FLAT)
@@ -223,7 +286,7 @@ bars = await self.ib.reqHistoricalDataAsync(
    Reconciliation complete: positions match
    ```
 
-4. **Historical Warmup (KEY VERIFICATION POINT):**
+5. **Historical Warmup (KEY VERIFICATION POINT):**
    ```
    Loading 80 historical 4H bars for warmup...
    Warmup complete: loaded 80 bars (need 80 for signals)
@@ -234,7 +297,7 @@ bars = await self.ib.reqHistoricalDataAsync(
    Loading 80 historical 5-min bars for warmup...  ❌
    ```
 
-5. **Main Loop:**
+6. **Main Loop:**
    ```
    Checking for new bars every 300 seconds
    Connection monitoring enabled (handles IB Gateway reboots)

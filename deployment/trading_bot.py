@@ -108,6 +108,9 @@ class LiveTradingBot:
         # Bar tracking for deduplication
         self.last_bar_time: Optional[datetime] = None
 
+        # Baseline positions — snapshot at startup to ignore pre-existing positions
+        self.baseline_positions: set = set()
+
         # Reconciliation flag — set by Error 1102 handler, consumed by main loop
         self._needs_reconciliation: bool = False
 
@@ -257,7 +260,12 @@ class LiveTradingBot:
             self.logger.info("Reconciling position state with IB...")
 
             # positions() is synchronous — returns complete list immediately
-            positions = self.ib.positions()
+            # Filter out baseline positions (e.g., EUR→USD conversion)
+            positions = [
+                p for p in self.ib.positions()
+                if (p.contract.symbol, p.contract.currency, round(p.position))
+                not in self.baseline_positions
+            ]
 
             # Find EUR/USD position
             eur_usd_position = None
@@ -411,7 +419,12 @@ class LiveTradingBot:
         Returns:
             1 (LONG), -1 (SHORT), or 0 (FLAT).
         """
-        positions = self.ib.positions()
+        # Filter out baseline positions (e.g., EUR→USD conversion)
+        positions = [
+            p for p in self.ib.positions()
+            if (p.contract.symbol, p.contract.currency, round(p.position))
+            not in self.baseline_positions
+        ]
         for pos in positions:
             if hasattr(pos.contract, "pair") and pos.contract.pair() == "EURUSD":
                 if pos.position > 0:
@@ -1079,6 +1092,14 @@ class LiveTradingBot:
             self.logger.info(
                 f"Capital set from account: {eur_balance:,.2f} EUR"
             )
+
+            # Capture baseline positions (e.g., from EUR→USD conversion)
+            existing = await self.ib.reqPositionsAsync()
+            self.baseline_positions = {
+                (p.contract.symbol, p.contract.currency, round(p.position))
+                for p in existing
+            }
+            self.logger.info(f"Baseline positions at startup: {self.baseline_positions}")
 
             await self.reconcile_positions()
 
