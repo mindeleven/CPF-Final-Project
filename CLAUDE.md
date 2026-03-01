@@ -149,6 +149,8 @@ These patterns were learned from production bugs. Do not regress:
 | Fill waiting | 30s loop with `trade.isDone()` | `await self.ib.sleep(2)` (unreliable) |
 | Soft reconnect | Reconcile on Error 1102 via `_needs_reconciliation` flag | Ignoring Error 1102 (causes stale position state) |
 | Pre-trade verify | `_get_ib_eur_position()` before close-then-open | Trusting bot state without IB check |
+| IB duration limit | Use "D" (days) for 4H bars, "S" (seconds) for 5min | Duration > 86400s with "S" causes Error 321 |
+| Baseline positions | Snapshot at startup, filter from reconciliation | Pre-existing positions confuse reconciliation logic |
 
 ### Bot Architecture
 
@@ -156,16 +158,17 @@ These patterns were learned from production bugs. Do not regress:
 run()
   connect() → qualifyContractsAsync() + register _on_error (Error 1102 handler)
   check_eur_balance() → abort if < MIN_EUR_BALANCE
-  reconcile_positions() → sync with IB reality, preserve fill-based entry_price
-  load_historical_warmup() → reqHistoricalDataAsync, ~80 bars in ~4 seconds
+  capture baseline_positions → snapshot existing positions (e.g., EUR→USD conversion)
+  reconcile_positions() → sync with IB reality, filter baseline, preserve fill-based entry_price
+  load_historical_warmup() → reqHistoricalDataAsync, 80 bars, uses "D" for 4H (IB duration limit)
   main loop:
     connection health check → reconnect + reconcile if disconnected
     _needs_reconciliation check → reconcile after soft connectivity restore (1102)
-    fetch_latest_bar() → reqHistoricalDataAsync, 5-min bars
+    fetch_latest_bar() → reqHistoricalDataAsync, timeframe-aware bar size
     deduplicate by bar timestamp (self.last_bar_time)
     calculate_indicators() → generate_signal()
     execute_order():
-      _get_ib_eur_position() → reconcile if mismatch (pre-trade safety net)
+      _get_ib_eur_position() → reconcile if mismatch (pre-trade safety net), filters baseline
       check_eur_balance() before every trade
       close_position() → GTC, 30s wait, returns bool
       sleep(1) settlement delay
@@ -227,10 +230,13 @@ run()
 | 7G | Entry price fix | avgCost is per-unit for forex, not total cost |
 | 7H | Connectivity reconciliation | Reconcile on Error 1102 + pre-trade IB position verify |
 | 8A | Initial capital correction | 20K initial capital, regenerated all CSVs, updated notebook |
+| 09 | 5min live results | 11 trades over 5 days, -10 EUR P&L, Error 201 analysis |
+| 09B | Error 201 fix | EUR→USD conversion guide, corrected root cause |
+| 09C | 4H deployment prep | Correct params, timeframe-aware bars, baseline positions, IB duration fix |
 
 ---
 
-## Notebook Status (as of 2026-02-27)
+## Notebook Status (as of 2026-03-02)
 
 Current state: `migration/03-final-deliverable/03b-current-nb-20260227/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
 - Total: 4,936 lines, 10 main sections + Abstract + References

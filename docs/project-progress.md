@@ -1,7 +1,7 @@
 # CPF Final Project - Progress Report
-**Date:** February 21, 2026
-**Status:** ~95% Complete - Live Bot Production-Ready, Notebook In Progress
-**Timeline:** 5.5 weeks to deadline (March 31, 2026)
+**Date:** March 2, 2026
+**Status:** ~97% Complete - 4H Live Test Starting, Notebook Sections 1-8 Complete
+**Timeline:** 4 weeks to deadline (March 31, 2026)
 
 ---
 
@@ -97,6 +97,27 @@
 - Moved CSV files to `data/backtest/` and `data/optimization/`
 - Updated notebook section 6 and all project documentation
 
+### Session 09: 5-Minute Live Trading Results
+- Feb 23-27, 2026 (5 days): 11 trades, -10.24 EUR P&L
+- Win rate: 36.4%, Sharpe -0.87 (not meaningful over 5 days)
+- 4 nightly IB Gateway reboots handled successfully
+- 7 trades closed by reconciliation (position vanished during nightly reset)
+- Error 201 analysis: bot checks EUR but BUY orders require USD
+
+### Session 09B: Error 201 Root Cause & Fix
+- Root cause: BUY EUR.USD = buy EUR with USD (requires USD balance)
+- Account EUR-denominated (~1M EUR, insufficient USD)
+- Solution: Manual EUR→USD conversion via IB Gateway
+- Created `docs/ib-currency-conversion-guide.md`
+- Convert 500K EUR → ~590K USD for balanced holdings
+
+### Session 09C: 4H Deployment Preparation (5 fixes)
+1. **Config fixes:** TIMEFRAME="4H", RUN_DURATION="5d", RSI_PERIOD=14, MOMENTUM_PERIOD=10
+2. **Timeframe-aware bar sizes:** Dynamic "S" or "D" suffix for IB historical requests
+3. **Baseline position snapshot:** Ignore pre-existing conversion positions
+4. **IB duration limit fix:** Use "14 D" for 4H bars (not "1152000 S")
+5. **Documentation:** Updated handoff, specification, CLAUDE.md
+
 ---
 
 ## Optimized Strategy Parameters (Session 8A — corrected)
@@ -114,19 +135,57 @@ Optimal parameters are identical across all position size/capital combinations.
 
 ## Live Testing Results
 
-### 4-Hour Test (Feb 12-13, 2026)
-- First autonomous run after Session 7D
-- 4 trades, all losses (low-volatility period)
-- P&L: -$39.70 (-0.2%) — acceptable for validation
+### Early Tests (Feb 12-20, 2026)
+
+**4H Test (Feb 12-13):** First autonomous run after Session 7D
+- 4 trades, all losses (low-volatility period), P&L: -$39.70 (-0.2%)
 - Successful reconnection after IB Gateway disconnect
 - Revealed 8 bugs → fixed in Session 7E
 
-### 3-Day Test (Feb 18-20, 2026, post-7E fixes)
-- Duration: ~3 days (5min timeframe)
+**3-Day Test (Feb 18-20, post-7E):** 5min timeframe validation
 - Bot ran autonomously through multiple IB Gateway daily resets
 - Midnight reboot (Error 1100 → reconnect → reconcile): handled correctly
-- Soft connectivity blip: revealed stale state issue → fixed in Session 7H
-- Order rejection from stale state: root cause identified → fixed in Session 7H
+- Soft connectivity blip revealed stale state issue → fixed in Session 7H
+
+### Production 5-Minute Test (Feb 23-27, 2026) — Session 09
+
+**Duration:** 104.7 hours (Sunday 07:20 CET → Friday 16:00 CET)
+**Trades:** 11 total (6 LONG, 5 SHORT)
+**P&L:** -10.24 EUR (-0.001% of capital)
+**Win rate:** 36.4% (4 wins, 7 losses)
+
+**Infrastructure Performance:**
+- 4 nightly IB Gateway reboots: handled automatically
+- 9 position reconciliations: 7 detected mismatches, all resolved correctly
+- 0 crashes, 0 manual interventions required
+
+**Key Findings:**
+1. **Error 201 (currency leverage):** 3 BUY orders rejected on Feb 27
+   - Root cause: Bot checks EUR balance but BUY orders require USD
+   - Account has ~1M EUR but insufficient USD (~23K USD needed per BUY trade)
+   - Fix: Manual EUR→USD conversion (500K EUR → 590K USD)
+
+2. **Reconciliation-closed trades:** 63.6% (7/11) closed by reconciliation vs. strategy signal
+   - IB Gateway closes positions during nightly reset (paper trading behavior)
+   - Reconciliation correctly detects and records estimated P&L
+
+3. **Sample size:** 11 trades over 5 days insufficient for strategy evaluation
+   - Backtest showed 107 trades over 3 years (~36 trades/year)
+   - High variance expected in short samples
+
+**Sharpe ratio:** -0.87 (indicative only, not meaningful over 5 days)
+
+### Production 4-Hour Test (Mar 2-6, 2026) — In Progress
+
+**Status:** Started March 2, 2026 (Sunday evening)
+**Configuration:** 4H timeframe, 5-day runtime, optimized parameters (SMA 20/70, RSI 35/70)
+**Fixes applied:**
+- Corrected RSI_PERIOD=14, MOMENTUM_PERIOD=10 (were wrong: 21, 14)
+- Timeframe-aware bar sizes (uses "14 D" for 4H historical requests)
+- Baseline position snapshot (ignores EUR→USD conversion position)
+- EUR→USD conversion completed (~500K EUR → ~590K USD)
+
+**Expected:** ~2-3 trades over 5 days (4H bars complete every 4 hours, strategy is selective)
 
 ---
 
@@ -151,14 +210,13 @@ Notebook content is being written as markdown files in
 
 ---
 
-## Planned (Not Yet Implemented)
+## Deferred Features
 
 ### Error 1100 Backend Disconnect Pause Flag
 - Add `is_backend_connected` flag to `_on_error()` in `trading_bot.py`
 - Pause main loop between Error 1100 (IB daily reset) and Error 1102 (restored)
-- ~10 lines of code, documented in Session 8A handoff
-- Benefits: clean logs, no order attempts during reset, good for CPF report
-- To be implemented when bot code is next modified
+- Benefits: cleaner logs, no order attempts during reset
+- **Status:** Documented in Session 8A handoff but not implemented (not critical for project)
 
 ---
 
@@ -188,8 +246,9 @@ CPF-Final-Project/
 │   ├── backtest/      # Backtest result CSVs
 │   └── optimization/  # Optimization result CSVs
 ├── docs/
-│   ├── handoffs/      # Session handoff documents (1 through 8A)
+│   ├── handoffs/      # Session handoff documents (1 through 09C)
 │   ├── specifications/# Session specification documents
+│   ├── ib-currency-conversion-guide.md  # EUR→USD conversion instructions
 │   └── project-progress.md  # This file
 ├── notebooks/         # Jupyter analysis (pending)
 └── tests/             # Unit tests
@@ -223,11 +282,27 @@ CPF-Final-Project/
 
 ## Next Steps
 
-1. **Implement Error 1100 pause flag** (~10 lines, next bot modification)
-2. **Production 5min test run** (Mon-Fri, 5 days)
-3. **Production 4H test run** (following week, 5 days)
-4. **Write notebook sections 7, 9, 10, Abstract** (after live trading data available)
-5. **Final notebook assembly** in Jupyter
+1. **Monitor 4H live test** (Mar 2-6, 2026) — In progress
+   - Watch for first trade execution
+   - Verify no Error 201 rejections (after EUR→USD conversion)
+   - Confirm 4H bar timing and indicator calculations
+
+2. **Download 4H logs** (Friday, Mar 6 after market close)
+   - Analyze trade performance vs. backtest expectations
+   - Write Session 09D handoff document
+
+3. **Write notebook sections 7, 9, 10, Abstract** (after 4H test complete)
+   - Section 7: Live Trading Implementation
+   - Section 9: Live Trading Results & Analysis (5min + 4H)
+   - Section 10: Conclusion
+   - Abstract: Project summary
+
+4. **Final notebook assembly** in Jupyter
+   - Convert markdown sections to .ipynb
+   - Add execution results, charts
+   - Final review and polish
+
+5. **Submit deliverable** (by March 31, 2026)
 
 ---
 
@@ -243,5 +318,5 @@ CPF-Final-Project/
 
 ---
 
-**Last Updated:** February 21, 2026
-**Next Action:** Implement Error 1100 pause flag, then begin production 5min test run
+**Last Updated:** March 2, 2026
+**Next Action:** Monitor 4H live test (Mar 2-6), download logs Friday, write notebook sections 7/9/10
