@@ -38,6 +38,7 @@ from ib_async import IB, Forex, MarketOrder
 # Add project root to path so we can import our modules
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from modules.indicators import SMA, RSI, Momentum
+from modules.config import get_timeframe_config
 
 from config_live import (
     CHECK_FREQUENCY,
@@ -531,18 +532,30 @@ class LiveTradingBot:
     # =========================================================================
 
     async def load_historical_warmup(self) -> None:
-        """Load historical 5-minute bars for indicator warmup.
+        """Load historical bars for indicator warmup.
 
         Fetches enough bars from IB so that indicators can produce
-        signals immediately, eliminating the 70+ minute cold-start wait.
+        signals immediately, eliminating the cold-start wait.
         """
+        # Get timeframe configuration
+        tf_config = get_timeframe_config(TIMEFRAME)
+        ib_bar_size = tf_config["ib_bar_size"]
+
+        # Calculate duration based on timeframe
         bars_needed = max(SMA_SLOW, RSI_PERIOD + 1, MOMENTUM_PERIOD + 1) + 10
-        # Convert bars to duration string (bars * 5 minutes, in seconds)
-        duration_seconds = bars_needed * 5 * 60
+
+        if TIMEFRAME == "5min":
+            bar_duration_seconds = 5 * 60  # 5 minutes
+        elif TIMEFRAME == "4H":
+            bar_duration_seconds = 4 * 60 * 60  # 4 hours
+        else:
+            raise ValueError(f"Unsupported timeframe: {TIMEFRAME}")
+
+        duration_seconds = bars_needed * bar_duration_seconds
         duration_str = f"{duration_seconds} S"
 
         self.logger.info(
-            f"Loading {bars_needed} historical 5-min bars for warmup..."
+            f"Loading {bars_needed} historical {TIMEFRAME} bars for warmup..."
         )
 
         try:
@@ -550,7 +563,7 @@ class LiveTradingBot:
                 self.contract,
                 endDateTime="",
                 durationStr=duration_str,
-                barSizeSetting="5 mins",
+                barSizeSetting=ib_bar_size,
                 whatToShow="MIDPOINT",
                 useRTH=False,
                 formatDate=1,
@@ -581,17 +594,29 @@ class LiveTradingBot:
             self.logger.info("Will collect bars in real-time (slower startup)")
 
     async def fetch_latest_bar(self) -> Optional[Dict]:
-        """Fetch the latest completed 5-minute bar via reqHistoricalData.
+        """Fetch the latest completed bar via reqHistoricalData.
 
         Returns:
             Dict with {date, open, high, low, close}, or None if fetch fails.
         """
+        # Get timeframe configuration
+        tf_config = get_timeframe_config(TIMEFRAME)
+        ib_bar_size = tf_config["ib_bar_size"]
+
+        # Set duration based on timeframe
+        if TIMEFRAME == "5min":
+            duration_str = "300 S"  # 5 minutes
+        elif TIMEFRAME == "4H":
+            duration_str = "14400 S"  # 4 hours
+        else:
+            raise ValueError(f"Unsupported timeframe: {TIMEFRAME}")
+
         try:
             bars = await self.ib.reqHistoricalDataAsync(
                 self.contract,
                 endDateTime="",
-                durationStr="300 S",
-                barSizeSetting="5 mins",
+                durationStr=duration_str,
+                barSizeSetting=ib_bar_size,
                 whatToShow="MIDPOINT",
                 useRTH=False,
                 formatDate=1,

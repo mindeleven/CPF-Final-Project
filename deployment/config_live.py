@@ -21,7 +21,7 @@ IB_CLIENT_ID = 753  # Unique client ID (change if running multiple bots)
 # =============================================================================
 
 # Choose timeframe: '5min' or '4H'
-TIMEFRAME = "5min"  # Change to '4H' for 4-hour trading
+TIMEFRAME = "4H"  # Change to '4H' for 4-hour trading
 
 # =============================================================================
 # RUNTIME CONFIGURATION
@@ -30,7 +30,7 @@ TIMEFRAME = "5min"  # Change to '4H' for 4-hour trading
 # How long should the bot run?
 # Format: "Xh" for hours, "Xd" for days, "Xm" for minutes
 # Examples: "1h", "8h", "5d"
-RUN_DURATION = "1h"  # Start with 1-hour test
+RUN_DURATION = "5d"  # 5-day test (Monday-Friday)
 
 # How often to check for new data (seconds)
 # 5min timeframe: check every 60 seconds
@@ -80,10 +80,10 @@ elif TIMEFRAME == "4H":
     # 4-hour optimized parameters (Session 6B)
     SMA_FAST = 20
     SMA_SLOW = 70
-    RSI_PERIOD = 21
+    RSI_PERIOD = 14
     RSI_LOWER = 35
     RSI_UPPER = 70
-    MOMENTUM_PERIOD = 14
+    MOMENTUM_PERIOD = 10
     MOMENTUM_THRESHOLD = 0.0
 
 else:
