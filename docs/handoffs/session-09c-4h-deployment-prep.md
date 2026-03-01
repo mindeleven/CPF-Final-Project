@@ -9,11 +9,12 @@
 
 ## Summary
 
-Fixed four critical issues preventing 4H live trading:
+Fixed five critical issues preventing 4H live trading:
 1. **Wrong strategy parameters** in `config_live.py` (RSI_PERIOD=21, MOMENTUM_PERIOD=14 should be 14, 10)
 2. **Hardcoded 5-minute bar size strings** in `trading_bot.py` (two methods affected)
 3. **Configuration values** for 4H run (TIMEFRAME, RUN_DURATION)
 4. **Baseline position snapshot** to ignore pre-existing currency conversion positions (added March 2)
+5. **IB duration limit** for 4H historical data — use "D" (days) instead of "S" (seconds) for requests > 86400s (added March 2)
 
 All fixes verified by code review. No local testing possible (market closed, Docker build on server only).
 
@@ -178,8 +179,13 @@ bars = await self.ib.reqHistoricalDataAsync(
 
 **Key changes:**
 - `ib_bar_size` comes from `TIMEFRAME_CONFIGS[TIMEFRAME]["ib_bar_size"]`
-- Bar duration calculated dynamically: 5 min (300s) or 4 hours (14400s)
+- Bar duration calculated dynamically: 5 min (300s) or 4 hours (14 days)
 - Log message shows actual timeframe: "5min" or "4H"
+
+**Critical fix (added March 2):** IB rejects duration > 86400 seconds with "S" suffix
+- For 5min: uses seconds ("S" suffix) — e.g., "24000 S"
+- For 4H: uses days ("D" suffix) — e.g., "14 D" (80 bars × 4 hours = 320 hours = 14 days)
+- Without this fix: Error 321 "Historical data request for greater than 86400 seconds rejected"
 
 #### fetch_latest_bar() Method (lines 596-640)
 
