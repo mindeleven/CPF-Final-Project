@@ -26,6 +26,7 @@ Key Features:
 
 import asyncio
 import logging
+import math
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -559,13 +560,16 @@ class LiveTradingBot:
 
         if TIMEFRAME == "5min":
             bar_duration_seconds = 5 * 60  # 5 minutes
+            duration_seconds = bars_needed * bar_duration_seconds
+            duration_str = f"{duration_seconds} S"
         elif TIMEFRAME == "4H":
-            bar_duration_seconds = 4 * 60 * 60  # 4 hours
+            # IB rejects duration > 86400 seconds with "S" suffix
+            # Use days instead: 80 bars * 4 hours = 320 hours = 13.33 days
+            total_hours = bars_needed * 4
+            total_days = math.ceil(total_hours / 24)
+            duration_str = f"{total_days} D"
         else:
             raise ValueError(f"Unsupported timeframe: {TIMEFRAME}")
-
-        duration_seconds = bars_needed * bar_duration_seconds
-        duration_str = f"{duration_seconds} S"
 
         self.logger.info(
             f"Loading {bars_needed} historical {TIMEFRAME} bars for warmup..."
