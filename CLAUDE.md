@@ -233,48 +233,67 @@ run()
 | 09 | 5min live results | 11 trades over 5 days, -10 EUR P&L, Error 201 analysis |
 | 09B | Error 201 fix | EUR→USD conversion guide, corrected root cause |
 | 09C | 4H deployment prep | Correct params, timeframe-aware bars, baseline positions, IB duration fix |
+| 10 | 4H live run analysis | Awaiting log files from server; notebook reviewed (03d version, 4947 lines) |
 
 ---
 
-## Notebook Status (as of 2026-03-02)
+## Notebook Status (as of 2026-03-06)
 
-Current state: `migration/03-final-deliverable/03b-current-nb-20260227/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
-- Total: 4,936 lines, 10 main sections + Abstract + References
+Current state: `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
+- Total: 4,947 lines, 10 main sections + Abstract + References
+- Images directory: same folder as the .md file (ignore any subdirectory paths in image refs)
+
+### Section Line Numbers (03d version)
+
+| Section | Start Line |
+|---------|-----------|
+| Abstract | 11 |
+| 1. Project Setup | 42 |
+| 2. Strategic Decisions | 387 |
+| 3. Data Preparation | 715 |
+| 4. Technical Indicator Calculation | 1340 |
+| 5. Signal Generation and Position Management | 2250 |
+| 6. Backtest Implementation | 2700 |
+| 7. Live Trading Implementation | 4149 |
+| 8. Cloud Deployment | 4366 |
+| 9. Results from Cloud Trading Run | 4802 |
+| 10. Conclusion | 4849 |
+| References | 4908 |
 
 ### Section Structure
 
 | Section | Title | Status | Key Content |
 |---------|-------|--------|-------------|
-| Abstract | — | Placeholder | Awaiting live results ([X]% return, Sharpe [X]) |
+| Abstract | — | Complete | Full abstract including 5min and 4H results summary |
 | 1 | Project Setup | Complete | IBKR selection, DigitalOcean setup, Docker, IB Gateway deployment, VNC config |
 | 2 | Strategic Decisions | Complete | EUR/USD rationale, timeframe selection, MA/RSI/Momentum parameter reasoning |
-| 3 | Data Preparation | Complete | Load 3 timeframes, visualizations, quality checks |
+| 3 | Data Preparation | Complete | Load 3 timeframes, visualizations, quality checks, data limitations |
 | 4 | Technical Indicator Calculation | Complete | SMA, RSI, Momentum implementation + validation |
 | 5 | Signal Generation and Position Management | Complete | Strategy logic, signal→position conversion, validation |
 | 6 | Backtest Implementation | Complete | Results tables, heatmaps, optimal params (SMA 15/70, 20/70) |
-| 7 | Live Trading Implementation | Complete | Requirements, architecture, challenges (8 bugs), testing history |
+| 7 | Live Trading Implementation | Complete | Requirements, architecture, 8 challenges, testing history (3 runs) |
 | 8 | Cloud Deployment | Complete | Docker containerization, deployment process, monitoring, lifecycle mgmt |
-| 9 | Results from Cloud Trading Run | **PENDING** | 9.1 has placeholder text, 9.2-9.3 empty |
-| 10 | Conclusion | **PENDING** | All subsections empty (10.1-10.5) |
+| 9 | Results from Cloud Trading Run | **PARTIAL** | 9.1 complete, 9.2 has 5min results + 4H placeholder, 9.3 complete |
+| 10 | Conclusion | Complete | All subsections 10.1–10.5 written |
 | References | — | Complete | 16 sources (academic + practitioner) |
 
-### Section 9 Placeholders (awaiting live data)
+### Section 9 — Current State (needs 4H run results)
 
-**9.1 Test Period Specification:**
-- Shows Feb 23-28 for 5min, Mar 1-5 for 4H (dates are placeholders)
-- Infrastructure events placeholder: "[N] scheduled IB Gateway infrastructure events"
+**9.1 Test Period Specification:** Complete for 5min run. States 4H run ran "March 1–6, 2026" (placeholder end date — needs actual end time from logs).
 
-**9.2 Performance Summary:** Empty (needs trade CSV analysis)
+**9.2 Performance Summary:**
+- 5min subsection: Complete (11 trades, −10.24 EUR, 36.4% win rate, 4 reconcile-closed trades)
+- 4H subsection: Placeholder — "results will be added following completion and analysis of its logs"
 
-**9.3 Lessons Learned:** Empty (needs reflection on live run vs backtest)
+**9.3 Lessons Learned:** Complete (infrastructure resilience, reconciliation noise in paper trading, USD balance requirement).
 
-### Section 10 Structure (all empty)
+### Section 10 — Complete Summary
 
-- 10.1 Key Achievements
-- 10.2 Strategy Performance Analysis
-- 10.3 Technical Lessons Learned
-- 10.4 Future Directions (has one bullet point on Sortino ratio as placeholder)
-- 10.5 Final Reflections
+- 10.1 Key Achievements: Complete
+- 10.2 Strategy Performance Analysis: Complete
+- 10.3 Technical Lessons Learned: Complete (GTC, fill polling, avgCost, currency management, reconciliation)
+- 10.4 Future Directions: Complete (pagination, train/test split, Sortino, programmatic FX conversion, second strategy, regime filter)
+- 10.5 Personal Reflection: Complete
 
 ### Key Parameters Confirmed
 
@@ -283,4 +302,50 @@ Current state: `migration/03-final-deliverable/03b-current-nb-20260227/ALGORITHM
 - 4H: SMA 20/70, RSI 14 (35/70), Momentum 10 (0.0) → Sharpe 1.42, +30.23%, 45 trades
 - Both use config defaults: `rsi_period=14, momentum_period=10`
 
-**Critical note:** Section 6 optimization tables and heatmaps show correct Sharpe values (4.55/1.42). The earlier Sharpe discrepancy (0.37 vs 1.42 for 4H) was resolved by fixing wrong RSI/Momentum periods in CLAUDE.md table.
+---
+
+## 4H Live Run Analysis — Context for Log Review
+
+The 4H live trading run (started March 1, 2026 at 23:38 CET) is ending on March 6, 2026. Logs will be retrieved and analyzed to complete Section 9.2.
+
+### Log File Format (from 5min run reference)
+
+**Trade CSV columns:** `entry_time, exit_time, direction, entry_price, exit_price, size, gross_pnl, costs, net_pnl, net_pnl_eur, capital_eur`
+
+**Direction values:** `LONG`, `SHORT`, `LONG (IB reconcile)`, `SHORT (IB reconcile)` — the reconcile suffix indicates the position was closed by nightly reboot rather than by a strategy signal.
+
+**Summary file format:**
+```
+Trading Session Summary
+Timeframe: 4H
+Parameters: SMA 20/70, RSI 35/70, Mom 0.0
+Duration: X days, H:MM:SS
+Total Trades: N
+Win Rate: X.X%
+Total P&L: EUR X.XX
+Final Capital: EUR XXX,XXX.XX
+Return: X.XX%
+```
+
+### Expected 4H Run Characteristics
+
+- Position size: 20,000 EUR
+- Check frequency: every 300 seconds (5 min sleep between bar checks)
+- 4H bar = 1 bar per 4 hours → at most 6 bars/day → at most ~30 bars over 5 days
+- Expected trades: few (backtest averaged 45 over 3 years ≈ 15/year ≈ 0-1 per week)
+- Nightly reboots: ~4-5 (one per day, ~05:26–05:52 CET)
+- Market context: EUR/USD repriced sharply lower on Sunday March 1 due to Iran geopolitical event (US/Israeli strikes); bot started into a new trending regime
+- Account was manually rebalanced (EUR→USD conversion) before deployment to avoid Error 201
+- Baseline position snapshot implemented to filter the EUR→USD conversion virtual FX position from reconciliation
+
+### What to Extract from 4H Logs for Section 9.2
+
+1. **Run duration**: Start time (should be ~2026-03-01 23:38 CET), end time, total hours
+2. **Trade count**: Total number of closed trades
+3. **Win rate**: % of profitable trades
+4. **Net P&L**: Total EUR P&L
+5. **Largest winning/losing trade**: For narrative context
+6. **Reconcile-closed trades**: Count of "(IB reconcile)" exits vs strategy-signal exits
+7. **Infrastructure events**: Number of nightly reboots, reconnection success/failure
+8. **Any Error 201 occurrences**: Should be zero (account was rebalanced)
+9. **Any unexpected errors**: Review log file for anomalies
