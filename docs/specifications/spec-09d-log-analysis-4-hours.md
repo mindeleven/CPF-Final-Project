@@ -1,7 +1,7 @@
 # Log Analysis Instructions — 4-Hour Live Trading Run
 
-Analyse the live trading bot logs from the 4-hour paper trading run (March 2–6, 2026). 
-The relevant files are in `deployment/logs/` and have `-5d-4H` as part of the filename. 
+Analyse the live trading bot logs from the 4-hour paper trading run (March 1–6, 2026). 
+The relevant files are in `deployment/logs/` and have `_4H_5d_` as part of the filename. 
 Produce a structured summary document saved as 
 `docs/handoffs/session-09d-live-results-4hour.md` containing the following:
 
@@ -63,7 +63,7 @@ the following:
 
 - Is the observed trade count consistent with the backtest rate, or is it lower than 
   expected even for a one-week window?
-- The run started on Sunday March 2 into a market that had already repriced sharply 
+- The run started on Sunday March 1 into a market that had already repriced sharply 
   following US/Israeli military strikes on Iran over the weekend. EUR/USD gapped lower 
   at the Sunday open, entering an unusual trending regime before the first bar. Consider 
   whether this event is likely to have suppressed signal generation (e.g. by causing the 
