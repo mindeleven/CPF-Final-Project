@@ -10,6 +10,7 @@ pyyaml==6.0.1          # Configuration files
 seaborn==0.13.0        # Better visualizations
 tabulate==0.9.0        # Pretty tables in notebook
 pytest==7.4.3          # Testing
+pytz==2024.1           # Explicit timezone handling for maintenance window (CET/CEST)
 
 # Code quality
 black==23.12.0         # PEP 8 formatting
