@@ -62,9 +62,11 @@ One minute before `MAINTENANCE_WINDOW_START` (i.e. at 23:29 CET), append a
 of the active trading day before the pause begins.
 
 The row should use the same columns as existing trade rows, with:
-- `trade_type` = `"DAILY_SNAPSHOT"` (or equivalent column name already in use)
-- `pnl_eur` and `pnl_usd` = cumulative net P&L at that moment
-- All other trade-specific columns (entry price, exit price, etc.) = empty or null
+- `direction` = `"DAILY_SNAPSHOT"` (existing column; no schema change)
+- `net_pnl_eur` = cumulative net P&L at that moment
+- `capital_eur` = current capital
+- All other trade-specific columns (entry_time, entry_price, exit_price, size,
+  gross_pnl, costs, net_pnl) = empty
 
 The existing log analysis script must filter out `DAILY_SNAPSHOT` rows before
 calculating trade statistics (win rate, average P&L, etc.) so they do not skew
@@ -96,7 +98,8 @@ Before starting the container:
   Momentum 10 (threshold 0.0)
 - Confirm `MAINTENANCE_WINDOW_START = "23:30"` and `MAINTENANCE_WINDOW_END = "06:00"`
 - Run the container with a distinct name, e.g. `trading-bot-5min-r3`
-- Confirm pytz is in deployment/requirements.txt (needed for explicit timezone handling in the maintenance window check)
+- Confirm pytz is in deployment/requirements.txt (needed for explicit timezone handling
+  in the maintenance window check) — already present as pytz==2024.1
 
 ---
 

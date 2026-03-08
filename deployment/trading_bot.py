@@ -28,12 +28,13 @@ import asyncio
 import logging
 import math
 import sys
-from datetime import datetime, timedelta
+from datetime import date as dt_date, datetime, timedelta, time as dt_time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+import pytz
 from ib_async import IB, Forex, MarketOrder
 
 # Add project root to path so we can import our modules
@@ -48,6 +49,8 @@ from config_live import (
     IB_HOST,
     IB_PORT,
     INITIAL_CAPITAL,
+    MAINTENANCE_WINDOW_END,
+    MAINTENANCE_WINDOW_START,
     MIN_EUR_BALANCE,
     MOMENTUM_PERIOD,
     MOMENTUM_THRESHOLD,
@@ -115,6 +118,17 @@ class LiveTradingBot:
         # Reconciliation flag — set by Error 1102 handler, consumed by main loop
         self._needs_reconciliation: bool = False
 
+        # Maintenance window state (Europe/Berlin timezone)
+        _h, _m = map(int, MAINTENANCE_WINDOW_START.split(":"))
+        self._mw_start: dt_time = dt_time(_h, _m)
+        _h, _m = map(int, MAINTENANCE_WINDOW_END.split(":"))
+        self._mw_end: dt_time = dt_time(_h, _m)
+        self._mw_active: bool = False
+        self._berlin_tz = pytz.timezone("Europe/Berlin")
+
+        # Daily snapshot tracking — date of last written DAILY_SNAPSHOT row
+        self._snapshot_date: Optional[dt_date] = None
+
         # Logging (set up before any log calls)
         self._setup_logging()
         self.trade_log_file = self._create_trade_log_file()
@@ -129,6 +143,9 @@ class LiveTradingBot:
         self.logger.info(f"Runtime: {RUN_DURATION}")
         self.logger.info(
             f"Bot will run until: {self.end_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        self.logger.info(
+            f"Maintenance window: {MAINTENANCE_WINDOW_START}–{MAINTENANCE_WINDOW_END} CET"
         )
 
     # =========================================================================
@@ -1060,6 +1077,26 @@ class LiveTradingBot:
         else:
             print(f"WARNING: {msg}")
 
+    def _in_maintenance_window(self) -> bool:
+        """Check if current CET/CEST time is within the maintenance window.
+
+        Uses pytz Europe/Berlin for accurate timezone handling, including
+        automatic DST transition (CET→CEST at end of March).
+
+        The window spans midnight (23:30–06:00), so the condition is:
+        current_time >= mw_start OR current_time < mw_end.
+
+        Returns:
+            True if current time falls within the maintenance window.
+        """
+        now_time = datetime.now(self._berlin_tz).time().replace(
+            second=0, microsecond=0
+        )
+        # Overnight window: start > end (e.g. 23:30 > 06:00)
+        if self._mw_start > self._mw_end:
+            return now_time >= self._mw_start or now_time < self._mw_end
+        return self._mw_start <= now_time < self._mw_end
+
     # =========================================================================
     # Main Loop
     # =========================================================================
@@ -1148,6 +1185,36 @@ class LiveTradingBot:
                         "Running scheduled reconciliation after connectivity restore..."
                     )
                     await self.reconcile_positions()
+
+                # Daily P&L snapshot at 23:29 CET (one minute before window start)
+                now_berlin = datetime.now(self._berlin_tz)
+                if (
+                    now_berlin.hour == 23
+                    and now_berlin.minute == 29
+                    and self._snapshot_date != now_berlin.date()
+                ):
+                    self._snapshot_date = now_berlin.date()
+                    self._save_daily_snapshot()
+
+                # Maintenance window — pause signal/order logic during nightly window
+                if self._in_maintenance_window():
+                    if not self._mw_active:
+                        self._mw_active = True
+                        self.logger.info(
+                            f"Maintenance window active — resuming at "
+                            f"{MAINTENANCE_WINDOW_END} CET."
+                        )
+                    await asyncio.sleep(60)
+                    continue
+
+                # Maintenance window just ended — reload warmup before first signal
+                if self._mw_active:
+                    self._mw_active = False
+                    self.logger.info(
+                        "Maintenance window ended — reloading warmup bars "
+                        "before resuming."
+                    )
+                    await self.load_historical_warmup()
 
                 # Check if market is open
                 if not self._is_forex_open():
@@ -1283,6 +1350,30 @@ class LiveTradingBot:
                 f"{trade['net_pnl']:.2f},{trade['net_pnl_eur']:.2f},"
                 f"{trade['capital_eur']:.2f}\n"
             )
+
+    def _save_daily_snapshot(self) -> None:
+        """Append a DAILY_SNAPSHOT row to the trade CSV.
+
+        Records cumulative P&L at 23:29 CET, one minute before the
+        maintenance window begins. Uses the direction column to hold the
+        value "DAILY_SNAPSHOT" so it is filterable without schema changes.
+        Trade-specific fields (entry/exit price, size, gross_pnl, costs,
+        net_pnl) are left empty.
+        """
+        cumulative_pnl_eur = self.current_capital - self.initial_capital
+        snapshot_time = datetime.now(self._berlin_tz).strftime("%Y-%m-%d %H:%M:%S")
+        # Columns: entry_time,exit_time,direction,entry_price,exit_price,
+        #          size,gross_pnl,costs,net_pnl,net_pnl_eur,capital_eur
+        # Snapshot fills: exit_time, direction, net_pnl_eur, capital_eur only.
+        with open(self.trade_log_file, "a") as f:
+            f.write(
+                f",{snapshot_time},DAILY_SNAPSHOT,,,,,,,"
+                f"{cumulative_pnl_eur:.2f},{self.current_capital:.2f}\n"
+            )
+        self.logger.info(
+            f"Daily snapshot: cumulative P&L = EUR {cumulative_pnl_eur:.2f}, "
+            f"capital = EUR {self.current_capital:,.2f}"
+        )
 
     def _print_summary(self) -> None:
         """Print and save final trading session summary."""

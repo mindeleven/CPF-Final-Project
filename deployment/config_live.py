@@ -48,6 +48,17 @@ CLOSE_BEFORE_WEEKEND = True
 WEEKEND_CLOSE_TIME = "16:00"  # 4:00 PM
 
 # =============================================================================
+# MAINTENANCE WINDOW
+# =============================================================================
+
+# Bot pauses signal checking and order placement during this window to avoid
+# IB Gateway nightly reboot disruptions. Open positions remain open.
+# Format: "HH:MM" in CET (Central European Time).
+# The window spans midnight, so 23:30–06:00 means: pause from 23:30 until 06:00.
+MAINTENANCE_WINDOW_START = "23:30"
+MAINTENANCE_WINDOW_END = "06:00"
+
+# =============================================================================
 # POSITION SIZING
 # =============================================================================
 
