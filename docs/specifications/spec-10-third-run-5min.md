@@ -44,7 +44,7 @@ a check against the maintenance window. The implementation must:
 
 - Parse `MAINTENANCE_WINDOW_START` and `MAINTENANCE_WINDOW_END` from config at
   startup (not on every iteration).
-- Use CET (Europe/Zurich or Europe/Berlin) as the timezone for the check.
+- The server runs UTC by default. The maintenance window check must use datetime.now(pytz.timezone('Europe/Berlin')) to get the correct CET/CEST-aware local time — never datetime.now() without a timezone, which would use the server's UTC clock and place the window 1 hour off. Note that pytz must be imported and Europe/Berlin handles the automatic transition to CEST at the end of March correctly.
 - Handle the overnight crossing correctly: the window from 23:30 to 06:00 spans
   midnight, so the condition is `time >= 23:30 OR time < 06:00`.
 - During the pause, sleep in 60-second cycles and log a single "Maintenance window
@@ -96,6 +96,7 @@ Before starting the container:
   Momentum 10 (threshold 0.0)
 - Confirm `MAINTENANCE_WINDOW_START = "23:30"` and `MAINTENANCE_WINDOW_END = "06:00"`
 - Run the container with a distinct name, e.g. `trading-bot-5min-r3`
+- Confirm pytz is in deployment/requirements.txt (needed for explicit timezone handling in the maintenance window check)
 
 ---
 
