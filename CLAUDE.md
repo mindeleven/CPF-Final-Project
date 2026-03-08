@@ -234,6 +234,7 @@ run()
 | 09B | Error 201 fix | EUR→USD conversion guide, corrected root cause |
 | 09C | 4H deployment prep | Correct params, timeframe-aware bars, baseline positions, IB duration fix |
 | 09D | 4H live run analysis | 0 trades, 112.4 hours, 10 connectivity events all handled; section 9.2 drafted |
+| 10 | Maintenance window + 3rd run prep | Configurable 23:30–06:00 CET pause added; DAILY_SNAPSHOT row; spec stored |
 
 ---
 
@@ -302,6 +303,35 @@ Current state: `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHM
 - 5min: SMA 15/70, RSI 14 (35/75), Momentum 10 (0.0) → Sharpe 4.55, +4.13%, 107 trades
 - 4H: SMA 20/70, RSI 14 (35/70), Momentum 10 (0.0) → Sharpe 1.42, +30.23%, 45 trades
 - Both use config defaults: `rsi_period=14, momentum_period=10`
+
+---
+
+## Third Live Run (5min) — Pending
+
+**Status:** Code changes committed (session 10). Run not yet started.
+**Spec:** `docs/specifications/spec-10-third-run-5min.md`
+**Pre-run checklist (manual steps before starting container):**
+- Set `TIMEFRAME = "5min"` and `RUN_DURATION = "5d"` in `config_live.py`
+- Confirm USD balance is sufficient (Error 201 root cause from first run)
+- Confirm baseline position snapshot in place (carried over from 4H run)
+- Confirm 5min params: SMA 15/70, RSI 14 (35/75), Momentum 10 (0.0)
+- Container name: `trading-bot-5min-r3`
+
+**Maintenance window implementation (added in session 10):**
+- `MAINTENANCE_WINDOW_START = "23:30"` and `MAINTENANCE_WINDOW_END = "06:00"` in `config_live.py`
+- Main loop checks `_in_maintenance_window()` before any signal/order logic
+- Window spans midnight: condition is `time >= 23:30 OR time < 06:00`
+- Uses `pytz.timezone("Europe/Berlin")` for CET/CEST-aware checks (never bare `datetime.now()`)
+- On entry: sets `_mw_active = True`, logs single message, sleeps in 60s cycles
+- On exit: sets `_mw_active = False`, calls `load_historical_warmup()`, logs resumption
+- `_save_daily_snapshot()` fires at 23:29 CET (guarded by `_snapshot_date` to avoid duplicates)
+- DAILY_SNAPSHOT row uses `direction` column (no schema change); `net_pnl_eur` = cumulative P&L
+- `self.trades` never receives snapshot rows → summary stats unaffected
+
+**Log analysis (after run completes):**
+- Save as: `docs/handoffs/session-10-live-results-5min-r3.md`
+- Key comparison metric: trades closed by reconciliation (was 7/11 = 63.6% in Feb run; should be near zero with window active)
+- Filter `direction == "DAILY_SNAPSHOT"` before computing win rate / average P&L
 
 ---
 
