@@ -318,15 +318,23 @@ Current state: `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHM
 - Container name: `trading-bot-5min-r3`
 
 **Maintenance window implementation (added in session 10):**
-- `MAINTENANCE_WINDOW_START = "23:30"` and `MAINTENANCE_WINDOW_END = "06:00"` in `config_live.py`
+- `MAINTENANCE_WINDOW_START = "00:30"` and `MAINTENANCE_WINDOW_END = "06:45"` in `config_live.py` (corrected in session 10B — see known issue below)
 - Main loop checks `_in_maintenance_window()` before any signal/order logic
-- Window spans midnight: condition is `time >= 23:30 OR time < 06:00`
+- Window spans midnight: condition is `time >= 00:30 OR time < 06:45`
 - Uses `pytz.timezone("Europe/Berlin")` for CET/CEST-aware checks (never bare `datetime.now()`)
 - On entry: sets `_mw_active = True`, logs single message, sleeps in 60s cycles
 - On exit: sets `_mw_active = False`, calls `load_historical_warmup()`, logs resumption
 - `_save_daily_snapshot()` fires at 23:29 CET (guarded by `_snapshot_date` to avoid duplicates)
 - DAILY_SNAPSHOT row uses `direction` column (no schema change); `net_pnl_eur` = cumulative P&L
 - `self.trades` never receives snapshot rows → summary stats unaffected
+
+**Known issue — UTC/CET timezone confusion in maintenance window (fix deferred):**
+The DigitalOcean server runs UTC by default, so all log timestamps are in UTC, not CET.
+IB Gateway events occur at:
+- Hard disconnect: 23:45 UTC = 00:45 CET
+- Soft reboot (Error 1100/1102): ~05:22–05:49 UTC = ~06:22–06:49 CET
+
+The original spec assumed the log timestamps were CET and set the window to 23:30–06:00 CET — which was too early and too short. The parameters were corrected manually to 00:30–06:45 CET (which the code interprets via pytz Europe/Berlin correctly). The underlying code logic is sound, but the parameter semantics are confusing: the config values are in CET, the log timestamps are in UTC, and these are currently not documented clearly together. A future improvement should either accept the window times in UTC, or add explicit inline documentation linking the UTC event times to the CET parameter values.
 
 **Log analysis (after run completes):**
 - Save as: `docs/handoffs/session-10-live-results-5min-r3.md`
