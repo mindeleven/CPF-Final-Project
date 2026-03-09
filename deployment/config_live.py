@@ -21,7 +21,7 @@ IB_CLIENT_ID = 753  # Unique client ID (change if running multiple bots)
 # =============================================================================
 
 # Choose timeframe: '5min' or '4H'
-TIMEFRAME = "4H"  # Change to '4H' for 4-hour trading
+TIMEFRAME = "5min"  # Change to '4H' for 4-hour trading
 
 # =============================================================================
 # RUNTIME CONFIGURATION
@@ -50,13 +50,19 @@ WEEKEND_CLOSE_TIME = "16:00"  # 4:00 PM
 # =============================================================================
 # MAINTENANCE WINDOW
 # =============================================================================
-
 # Bot pauses signal checking and order placement during this window to avoid
 # IB Gateway nightly reboot disruptions. Open positions remain open.
 # Format: "HH:MM" in CET (Central European Time).
-# The window spans midnight, so 23:30–06:00 means: pause from 23:30 until 06:00.
-MAINTENANCE_WINDOW_START = "23:30"
-MAINTENANCE_WINDOW_END = "06:00"
+#
+# NOTE: IB Gateway hard disconnect occurs at 23:45 UTC = 00:45 CET.
+# The current code implication is based on CET not UTC.
+# Soft reboot (Error 1100/1102) occurs between approximately 05:22–05:49 UTC
+# = 06:22–06:49 CET. Times below are in CET; add 1 hour to convert to UTC.
+# To take the UTC/CET mistake into account and cover the full maintenance window:
+# Start at 00:30 CET to catch the 00:45 CET hard disconnect with 15 min buffer.
+# End at 06:45 CET to clear the soft reboot window with a safe margin.
+MAINTENANCE_WINDOW_START = "00:30"
+MAINTENANCE_WINDOW_END = "06:45"
 
 # =============================================================================
 # POSITION SIZING
