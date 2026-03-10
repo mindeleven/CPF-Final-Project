@@ -1,4 +1,6 @@
-# EUR/USD Algorithmic Trading System
+# End-to-End Cloud Deployment of Automated Trading Strategies with IBKR
+
+## Developing an EUR/USD Algorithmic Trading System
 
 A production-grade automated forex trading system implementing a multi-indicator trend-following strategy with cloud deployment infrastructure.
 
@@ -8,7 +10,7 @@ A production-grade automated forex trading system implementing a multi-indicator
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 This project implements a complete algorithmic trading system for EUR/USD forex trading, from strategy development and backtesting to live deployment on cloud infrastructure. The system combines a trend-following approach (SMA crossovers) with momentum exhaustion filters (RSI and momentum indicators) for robust production infrastructure including Docker containerization, cloud deployment, and automated reconnection handling.
 
@@ -22,7 +24,7 @@ This project implements a complete algorithmic trading system for EUR/USD forex 
 - Position reconciliation and error recovery
 - Complete logging and trade tracking
 
-**Final Project:** This is the capstone project for the Algorithmic Trading certification, demonstrating the complete lifecycle from research to production deployment.
+**Final Project:** This is the capstone project for the Python Quants' Certificate in Python for Finance, demonstrating the complete lifecycle from research to production deployment.
 
 ---
 
@@ -30,138 +32,79 @@ This project implements a complete algorithmic trading system for EUR/USD forex 
 
 ```
 CPF-Final-Project/
-├── README.md                          # This file
-├── project-progress.md                # Complete development timeline (Sessions 1-8A)
-├── CLAUDE.md                          # Project instructions
-├── requirements.txt                   # Python dependencies
+├── README.md                                # This file
+├── CLAUDE.md                                # Project instructions
+├── ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb  # Final deliverable
+├── LICENSE                                  # License agreement
+├── requirements.txt                         # Python dependencies
 │
-├── data/                             # Market data and results storage
-│   ├── historical/                   # Historical price data from IB
-│   │   ├── 5min/                     # 5-minute bars
-│   │   │   └── EUR_USD_5min_*.csv
-│   │   ├── 4H/                       # 4-hour bars
-│   │   │   └── EUR_USD_4H_*.csv
-│   │   └── 1D/                       # Daily bars
-│   │       └── EUR_USD_1D_*.csv
-│   ├── backtest/                     # Backtest result CSVs
-│   │   ├── EUR_USD_5min_backtest.csv
-│   │   └── EUR_USD_4H_backtest.csv
-│   └── optimization/                 # Grid search optimization results
-│       ├── optimization_5min_*.csv
-│       └── optimization_4H_*.csv
+├── data/                                    # Market data and results storage
+│   ├── historical/                          # Historical price data from IB
+│   │   ├── 5min/                            # 5-minute bars
+│   │   ├── 4H/                              # 4-hour bars
+│   │   └── 1D/                              # Daily bars
+│   ├── backtest/                            # Backtest result CSVs
+│   └── optimization/                        # Grid search optimization results
 │
-├── deployment/                       # Production deployment
-│   ├── trading_bot.py               # Live trading bot (Session 7H version)
-│   ├── config_live.py               # Runtime config with optimized params
-│   ├── Dockerfile                   # Container build (context is project root)
-│   ├── docker-compose.yml           # IB Gateway orchestration
-│   ├── requirements.txt             # Bot dependencies
+├── deployment/                              # Production deployment
+│   ├── trading_bot.py                       # Live trading bot
+│   ├── config_live.py                       # Runtime config with optimized params
+│   ├── Dockerfile                           # Container build (context is project root)
+│   ├── requirements.txt                     # Bot dependencies
 │   ├── .dockerignore
-│   ├── .env.example                 # Environment variables template
-│   ├── logs/                        # Runtime logs (gitignored)
+│   ├── .env.example                         # Environment variables template
+│   ├── logs/                                # Runtime logs (gitignored)
 │   │   ├── trading_bot_*.log
 │   │   ├── trades_*.csv
 │   │   └── equity_*.csv
-│   └── DEPLOYMENT_GUIDE.md          # Cloud deployment instructions
+│   └── DEPLOYMENT_GUIDE.md                  # Cloud deployment instructions
 │
-├── docs/                            # Documentation
-│   ├── handoffs/                    # Session handoff documents
-│   │   ├── session-01-config-module.md
-│   │   ├── session-02-data-layer.md
-│   │   ├── session-03-indicators.md
-│   │   ├── session-04-strategy.md
-│   │   ├── session-05-backtesting.md
-│   │   ├── session-06-optimization.md
-│   │   ├── session-07-live-trading.md
-│   │   ├── session-07B-reconnection.md
-│   │   ├── session-07C-reconciliation.md
-│   │   ├── session-07D-contract-fixes.md
-│   │   ├── session-07E-production-fixes.md
-│   │   ├── session-07F-reconciliation-pnl.md
-│   │   ├── session-07G-entry-price-fix.md
-│   │   ├── session-07H-connectivity-reconciliation.md
-│   │   └── session-08A-initial-capital-correction.md
-│   ├── specifications/              # Session specification documents
-│   │   └── spec-XXX-description.md
-│   ├── guides/                      # Implementation guides
-│   │   ├── FINAL-NOTEBOOK-STRUCTURE-GUIDE.md
-│   │   ├── MODULAR-CODE-INTEGRATION-GUIDE.md
-│   │   └── IB-ERROR-1100-ANALYSIS-AND-SOLUTIONS.md
-│   └── api/                         # API documentation
-│       └── [module documentation]
+├── docs/                                    # Documentation
+│   ├── handoffs/                            # Session handoff documents
+│   ├── specifications/                      # Session specification documents
+│   ├── guides/                              # Implementation guides
+│   ├── project-progress.md                  # Documentation of development timeline
+│   ├── decision-point-session-02.md         # Decision data fetching approach
+│   └── ib-currency-conversion-guide.md      # Currency conversion
 │
-├── migration/                       # Project deliverable assembly (gitignored)
-│   └── 03-final-deliverable/
-│       └── 04-claude-code-files/
-│           ├── section-01-introduction.md
-│           ├── section-02-project-setup.md
-│           ├── section-03-data-acquisition.md
-│           ├── section-04-technical-indicators.md
-│           ├── section-05-signal-generation.md
-│           ├── section-06-backtest-implementation.md
-│           ├── section-07-live-trading.md (pending)
-│           ├── section-09-results-analysis.md (pending)
-│           └── section-10-conclusion.md (pending)
-│
-├── modules/                         # Core implementation modules
+├── modules/                                 # Core implementation modules
 │   ├── __init__.py
-│   ├── config/                      # Global configuration
+│   ├── backtest/                            # Backtesting framework
 │   │   ├── __init__.py
-│   │   ├── constants.py            # System-wide constants
-│   │   ├── timeframes.py           # Timeframe configurations
-│   │   └── validation.py           # Config validation
-│   ├── data/                        # Data handling
+│   │   ├── engine.py                        # BacktestEngine (t+1 execution)
+│   │   ├── metrics.py                       # Sharpe, drawdown, win rate, etc.
+│   │   └── transaction_costs.py             # Transaction cost modeling
+│   ├── config/                              # Global configuration
 │   │   ├── __init__.py
-│   │   ├── loader.py               # CSV loading with datetime indexing
-│   │   └── validator.py            # Data quality checks
-│   ├── indicators/                  # Technical indicators
+│   │   ├── constants.py                     # System-wide constants
+│   │   ├── timeframes.py                    # Timeframe configurations
+│   ├── data/                                # Data handling
 │   │   ├── __init__.py
-│   │   ├── base.py                 # Abstract Indicator base class
-│   │   ├── indicators.py           # SMA, RSI, Momentum implementations
-│   │   └── utils.py                # Indicator utilities
-│   ├── strategy/                    # Trading strategy
+│   │   ├── loader.py                        # CSV loading with datetime indexing
+│   ├── indicators/                          # Technical indicators
 │   │   ├── __init__.py
-│   │   ├── base.py                 # Abstract Strategy base class
-│   │   ├── marsimo_strategy.py     # Multi-Indicator Trend-Following Strategy
-│   │   └── optimizer.py            # Grid search optimizer
-│   ├── backtest/                    # Backtesting framework
+│   │   ├── base.py                          # Abstract Indicator base class
+│   │   ├── momentum.py                      # Momentum implementations
+│   │   ├── rsi.py                           # RSI implementations
+│   │   └── sma.py                           # SMA implementations
+│   ├── optimization/                        # Parameter optimization
 │   │   ├── __init__.py
-│   │   ├── engine.py               # BacktestEngine (t+1 execution)
-│   │   ├── costs.py                # Transaction cost modeling
-│   │   └── metrics.py              # Sharpe, drawdown, win rate, etc.
-│   ├── optimization/                # Parameter optimization
-│   │   ├── __init__.py
-│   │   ├── grid_search.py          # GridSearchOptimizer
-│   │   └── results.py              # OptimizationResults analysis
-│   └── utils/                       # Shared utilities
+│   │   ├── grid_search.py                   # GridSearchOptimizer
+│   │   └── results.py                       # OptimizationResults analysis
+│   └── strategy/                            # Trading strategy
 │       ├── __init__.py
-│       ├── logging_config.py       # Logging configuration
-│       └── helpers.py              # Helper functions
+│       ├── base.py                          # Abstract Strategy base class
+│       └── ma_rsi_momentum.py               # Multi-Indicator Trend-Following Strategy
 │
-├── notebooks/                       # Jupyter notebooks
-│   ├── ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb  # Final deliverable
-│   └── research/                    # Exploratory analysis
-│       └── [research notebooks]
-│
-├── scripts/                         # Utility scripts
-│   ├── fetch_historical_data.py    # Download data from IB Gateway
-│   ├── run_backtest.py             # Command-line backtesting
-│   ├── optimize_parameters.py      # Run grid search optimization
-│   └── regenerate_results_20k.py   # Session 8A: Re-run optimization
-│
-└── tests/                           # Unit tests
-    ├── __init__.py
-    ├── test_config.py
-    ├── test_data_loader.py
-    ├── test_indicators.py
-    ├── test_strategy.py
-    ├── test_backtest.py
-    └── test_optimization.py
+└── scripts/                                 # Utility scripts
+    ├── fetch_historical_data.py             # Download data from IB Gateway
+    ├── optimize_parameters.py               # Run grid search optimization
+    └── regenerate_results_20k.py            # Re-run optimization
 ```
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -261,7 +204,7 @@ python trading_bot.py
 
 ---
 
-## 📊 Strategy Overview
+## Strategy Overview
 
 ### Multi-Indicator Trend-Following Strategy
 
@@ -295,14 +238,14 @@ A trend-following approach combining:
 **Signal Generation Logic:**
 
 **LONG Entry (BUY):**
-- ✅ Fast SMA crosses above Slow SMA (bullish crossover = **trend signal**)
-- ✅ RSI < 30-35 (oversold = **momentum exhausted on downside**)
-- ✅ Momentum > 0 (upward pressure = **direction confirmed**)
+- Fast SMA crosses above Slow SMA (bullish crossover = **trend signal**)
+- RSI < 30-35 (oversold = **momentum exhausted on downside**)
+- Momentum > 0 (upward pressure = **direction confirmed**)
 
 **SHORT Entry (SELL):**
-- ✅ Fast SMA crosses below Slow SMA (bearish crossover = **trend signal**)
-- ✅ RSI > 70-75 (overbought = **momentum exhausted on upside**)
-- ✅ Momentum < 0 (downward pressure = **direction confirmed**)
+- Fast SMA crosses below Slow SMA (bearish crossover = **trend signal**)
+- RSI > 70-75 (overbought = **momentum exhausted on upside**)
+- Momentum < 0 (downward pressure = **direction confirmed**)
 
 **Position Management:**
 - One position at a time (LONG, SHORT, or FLAT)
@@ -312,7 +255,7 @@ A trend-following approach combining:
 **Why This Works:**
 The SMA crossover identifies the trend, while RSI and Momentum filters ensure entry occurs at favorable timing within that trend - specifically when counter-trend momentum has been exhausted and new directional momentum is building.
 
-### Backtesting Results (Session 8A - Corrected)
+### Backtesting Results
 
 **Initial Capital:** €20,000 (EUR account)  
 **Position Size:** €20,000 (1:1 leverage, no margin)  
@@ -362,7 +305,7 @@ Results:
 - **Purpose:** First autonomous run after Session 7D fixes
 - **Trades:** 4 (all losses due to low-volatility period)
 - **P&L:** -$39.70 (-0.2%)
-- **Outcome:** ✅ Infrastructure validated, revealed 8 production bugs
+- **Outcome:** Infrastructure validated, revealed 8 production bugs
 - **Impact:** Led to Session 7E critical fixes
 
 **Test 2: Post-Fix Validation (Feb 18-20, 2026)**
@@ -370,7 +313,7 @@ Results:
 - **Purpose:** Verify Session 7E fixes in production
 - **Infrastructure Events:** Multiple IB Gateway daily resets handled successfully
 - **Connectivity:** Automatic reconnection and position reconciliation working
-- **Outcome:** ✅ Revealed stale state issue → fixed in Session 7H
+- **Outcome:** Revealed stale state issue → fixed in Session 7H
 - **Impact:** Production-ready status achieved
 
 **Test 3: Extended Production Run (Feb 23-28, 2026)** 🔄 **IN PROGRESS**
@@ -389,7 +332,7 @@ Results:
 Edit `deployment/config_live.py`:
 
 ```python
-# Strategy Parameters (Session 8A - Optimized for 5min)
+# Strategy Parameters (Optimized for 5min)
 STRATEGY_PARAMS = {
     'sma_fast': 15,
     'sma_slow': 70,
@@ -446,8 +389,7 @@ All trading activity is logged to timestamped files in `logs/`:
 ```
 logs/
 ├── trading_bot_5min_20260223_090000.log    # Main bot log
-├── trades_5min_20260223_090000.csv         # Trade history
-└── equity_5min_20260223_090000.csv         # Equity tracking
+└── trades_5min_20260223_090000.csv         # Trade history
 ```
 
 ### Log Format
@@ -484,20 +426,7 @@ grep "Current position" logs/trading_bot_*.log | tail -1
 
 ---
 
-## 🛠️ Development
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest tests/
-
-# Run specific test module
-pytest tests/test_strategy.py
-
-# Run with coverage
-pytest --cov=modules tests/
-```
+## Development
 
 ### Code Style
 
@@ -539,7 +468,7 @@ class MyIndicator(Indicator):
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### IB Gateway Container
 
@@ -570,18 +499,9 @@ ssh -L 5900:localhost:5900 root@YOUR_DROPLET_IP
 docker-compose logs -f ib-gateway
 ```
 
-See [`deployment/README.md`](deployment/README.md) for full deployment guide.
-
 ---
 
-## 📚 Documentation
-
-### Key Documents
-
-- **[Final Notebook Structure Guide](docs/guides/FINAL-NOTEBOOK-STRUCTURE-GUIDE.md)** - Jupyter notebook organization
-- **[Code Integration Guide](docs/guides/MODULAR-CODE-INTEGRATION-GUIDE.md)** - Module architecture patterns
-- **[IB Error 1100 Analysis](docs/guides/IB-ERROR-1100-ANALYSIS-AND-SOLUTIONS.md)** - Production error handling
-- **[Session Logs](docs/session-logs/)** - Development timeline and decisions
+## Documentation
 
 ### Session Documentation
 
@@ -619,7 +539,7 @@ Each session documented in `docs/handoffs/session-XX-*.md` with:
 
 ---
 
-## 🐛 Production Bugs Resolved
+## Production Bugs Resolved
 
 The project encountered and resolved **8 critical production bugs** during live testing (Session 7E). These discoveries transformed the bot from a prototype to a production-ready system:
 
@@ -667,9 +587,9 @@ The project encountered and resolved **8 critical production bugs** during live 
 
 ---
 
-## 🔍 Known Issues & Limitations
+## Known Issues & Limitations
 
-## 🔍 Current Limitations & Future Work
+## Current Limitations & Future Work
 
 ### Interactive Brokers Connectivity
 
@@ -677,7 +597,7 @@ The project encountered and resolved **8 critical production bugs** during live 
 - **~23:45 CET:** IB server reboot (~15 minutes)
 - **~05:35 CET:** Maintenance window (~90 minutes)
 
-**Current Status:** ✅ Fully handled with automatic reconnection and position reconciliation (Sessions 7B, 7H)
+**Current Status:** Fully handled with automatic reconnection and position reconciliation (Sessions 7B, 7H)
 
 **Planned Enhancement (Not Yet Implemented):**
 - Add `is_backend_connected` pause flag during Error 1100 → 1102 window
@@ -719,7 +639,7 @@ The project encountered and resolved **8 critical production bugs** during live 
 
 ---
 
-## 🎓 Academic Context
+## Academic Context
 
 This project demonstrates:
 
@@ -743,7 +663,7 @@ This project demonstrates:
 
 ---
 
-## 📋 Requirements
+## Requirements
 
 ### Python Dependencies
 
@@ -783,19 +703,19 @@ pytest>=7.4.0
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is an academic project and is not actively seeking contributions. However, feedback and suggestions are welcome via issues.
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 **IMPORTANT:** This software is for educational purposes only.
 
@@ -810,7 +730,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Interactive Brokers** for robust API access and paper trading environment
 - **ib_async library (v2.1.0)** by Ewald de Wit - essential async Python IB API wrapper
@@ -822,7 +742,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Contact
+## Contact
 
 For questions about this project:
 - Create an issue in the repository
@@ -830,21 +750,21 @@ For questions about this project:
 
 ---
 
-## 🗓️ Project Timeline
+## Project Timeline
 
-**Start Date:** Mid-January 2026  
+**Start Date:** Late-January 2026  
 **Deadline:** March 31, 2026  
 **Current Status:** ~95% Complete - Live bot production-ready, final notebook in progress
 
 **Key Milestones:**
-- ✅ Session 1-4: Core modules (config, data, indicators, strategy)
-- ✅ Session 5-6: Backtesting framework and grid search optimization
-- ✅ Session 7A-7H: Live trading bot with production fixes (8 critical bugs resolved)
-- ✅ Session 8A: Initial capital correction and full re-optimization
-- ✅ First live test: 4-hour run (Feb 12-13, 2026) - validation successful
-- ✅ Second live test: 3-day run (Feb 18-20, 2026) - connectivity fixes verified
-- 🔄 Third live test: 5-day production run (Feb 23-28, 2026) - in progress
-- 🔄 Final documentation and notebook completion (Sections 7, 9, 10, Abstract)
+- Session 1-4: Core modules (config, data, indicators, strategy)
+- Session 5-6: Backtesting framework and grid search optimization
+- Session 7A-7H: Live trading bot with production fixes (8 critical bugs resolved)
+- Session 8A: Initial capital correction and full re-optimization
+- First live test: 4-hour run (Feb 12-13, 2026) - validation successful
+- Second live test: 3-day run (Feb 18-20, 2026) - connectivity fixes verified
+- Third live test: 5-day production run (Feb 23-28, 2026) - in progress
+- Final documentation and notebook completion (Sections 7, 9, 10, Abstract)
 
 See [`project-progress.md`](project-progress.md) for complete session-by-session development log.
 
