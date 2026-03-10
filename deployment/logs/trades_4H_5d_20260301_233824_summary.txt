@@ -1,0 +1,7 @@
+Trading Session Summary
+Timeframe: 4H
+Parameters: SMA 20/70, RSI 35/70, Mom 0.0
+Duration: 4 days, 16:23:08.001248
+Total Trades: 0
+Final Capital: EUR 952,192.21
+Return: 0.00%

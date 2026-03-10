@@ -5,9 +5,8 @@ __pycache__/
 
 # temporary migration files
 migration/*
-# logfiles of local testruns
-deployment/logs/*
-deployment/logs_temp*
+# Exclude temporary/development log files of local testruns
+deployment/logs/dev_*
 
 # C extensions
 *.so
