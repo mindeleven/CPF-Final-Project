@@ -1,0 +1,772 @@
+2026-03-01 23:38:24,423 - INFO - Trading Bot initialized for 4H timeframe
+2026-03-01 23:38:24,424 - INFO - Parameters: SMA 20/70, RSI 14 (35/70), Momentum 10 (threshold 0.0)
+2026-03-01 23:38:24,424 - INFO - Position size: 20,000 EUR
+2026-03-01 23:38:24,424 - INFO - Runtime: 5d
+2026-03-01 23:38:24,424 - INFO - Bot will run until: 2026-03-06 23:38:24
+2026-03-01 23:38:24,424 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-01 23:38:24,429 - INFO - Connected
+2026-03-01 23:38:24,452 - INFO - Logged on to server version 178
+2026-03-01 23:38:24,508 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-01 23:38:24,508 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-01 23:38:24,509 - INFO - Warning 2107, reqId -1: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2026-03-01 23:38:24,509 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-01 23:38:24,509 - INFO - API connection ready
+2026-03-01 23:38:24,523 - INFO - position: Position(account='DUM847254', contract=Forex('EURUSD', conId=12087792, localSymbol='EUR.USD', tradingClass='EUR.USD'), position=-50000.0, avgCost=1.1777201318291686)
+2026-03-01 23:38:24,757 - INFO - execDetails Execution(execId='0000e215.69a4bad0.01.01', time=datetime.datetime(2026, 3, 1, 22, 15, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17646, permId=62640619, clientId=1, orderId=107, liquidation=0, cumQty=40000.0, avgPrice=1.17646, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,758 - INFO - execDetails Execution(execId='0000e215.69a4bad1.01.01', time=datetime.datetime(2026, 3, 1, 22, 15, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17646, permId=62640620, clientId=1, orderId=113, liquidation=0, cumQty=40000.0, avgPrice=1.17646, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,796 - INFO - execDetails Execution(execId='0000e215.69a4bade.01.01', time=datetime.datetime(2026, 3, 1, 22, 15, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17646, permId=62640621, clientId=1, orderId=114, liquidation=0, cumQty=40000.0, avgPrice=1.17646, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,797 - INFO - execDetails Execution(execId='0000e215.69a4bc4a.01.01', time=datetime.datetime(2026, 3, 1, 22, 39, 54, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='BOT', shares=120000.0, price=1.17657, permId=62640628, clientId=1, orderId=120, liquidation=0, cumQty=120000.0, avgPrice=1.17657, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,797 - INFO - execDetails Execution(execId='0000e215.69a4bc98.01.01', time=datetime.datetime(2026, 3, 1, 22, 49, 13, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17741, permId=62640629, clientId=1, orderId=123, liquidation=0, cumQty=40000.0, avgPrice=1.17741, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,797 - INFO - execDetails Execution(execId='0000e215.69a4bcbc.01.01', time=datetime.datetime(2026, 3, 1, 22, 54, 54, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='BOT', shares=40000.0, price=1.17787, permId=62640630, clientId=1, orderId=125, liquidation=0, cumQty=40000.0, avgPrice=1.17787, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,797 - INFO - execDetails Execution(execId='0000e215.69a4bcc7.01.01', time=datetime.datetime(2026, 3, 1, 22, 56, 27, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=50000.0, price=1.17776, permId=62640631, clientId=1, orderId=126, liquidation=0, cumQty=50000.0, avgPrice=1.17776, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bad0.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bad1.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bade.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bc4a.01.01', commission=2.389585, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bc98.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bcbc.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,797 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bcc7.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:38:24,798 - INFO - Synchronization complete
+2026-03-01 23:38:24,798 - INFO - Connected to IB Gateway at localhost:4002
+2026-03-01 23:38:24,932 - INFO - Contract qualified: EUR (conId: 12087792)
+2026-03-01 23:38:24,933 - INFO - Connection monitoring active
+2026-03-01 23:38:24,933 - INFO - Trading bot started
+2026-03-01 23:38:24,933 - INFO - Checking EUR balance...
+2026-03-01 23:38:25,124 - INFO - EUR balance: 952,192.21 EUR
+2026-03-01 23:38:25,124 - INFO - Required minimum: 20,000.00 EUR
+2026-03-01 23:38:25,124 - INFO - Status: Sufficient
+2026-03-01 23:38:25,124 - INFO - Capital set from account: 952,192.21 EUR
+2026-03-01 23:38:25,169 - INFO - position: Position(account='DUM847254', contract=Forex('EURUSD', conId=12087792, localSymbol='EUR.USD', tradingClass='EUR.USD'), position=-50000.0, avgCost=1.1777201318291686)
+2026-03-01 23:38:25,169 - INFO - Baseline positions at startup: {('EUR', 'USD', -50000)}
+2026-03-01 23:38:25,169 - INFO - Reconciling position state with IB...
+2026-03-01 23:38:25,169 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-01 23:38:25,169 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-01 23:38:25,169 - INFO - Loading 80 historical 4H bars for warmup...
+2026-03-01 23:38:25,547 - INFO - Warmup complete: loaded 92 bars (need 80 for signals)
+2026-03-01 23:38:25,549 - INFO - Checking for new bars every 300 seconds
+2026-03-01 23:38:25,549 - INFO - Connection monitoring enabled (handles IB Gateway reboots)
+2026-03-01 23:45:01,193 - ERROR - Peer closed connection.
+2026-03-01 23:48:26,200 - WARNING - Connection lost detected!
+2026-03-01 23:48:26,200 - INFO - Attempting automatic reconnection...
+2026-03-01 23:48:26,200 - INFO - Reconnection attempt 1/10 (waiting 1s before trying)...
+2026-03-01 23:48:27,201 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-01 23:48:27,207 - INFO - Connected
+2026-03-01 23:48:27,472 - INFO - Logged on to server version 178
+2026-03-01 23:48:27,632 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-01 23:48:27,632 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-01 23:48:27,633 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-01 23:48:27,633 - INFO - API connection ready
+2026-03-01 23:48:27,670 - INFO - position: Position(account='DUM847254', contract=Forex('EURUSD', conId=12087792, localSymbol='EUR.USD', tradingClass='EUR.USD'), position=0.0, avgCost=0.0)
+2026-03-01 23:48:29,006 - INFO - execDetails Execution(execId='0000e215.69a4bad0.01.01', time=datetime.datetime(2026, 3, 1, 22, 15, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17646, permId=62640619, clientId=1, orderId=107, liquidation=0, cumQty=40000.0, avgPrice=1.17646, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,049 - INFO - execDetails Execution(execId='0000e215.69a4bad1.01.01', time=datetime.datetime(2026, 3, 1, 22, 15, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17646, permId=62640620, clientId=1, orderId=113, liquidation=0, cumQty=40000.0, avgPrice=1.17646, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,049 - INFO - execDetails Execution(execId='0000e215.69a4bade.01.01', time=datetime.datetime(2026, 3, 1, 22, 15, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17646, permId=62640621, clientId=1, orderId=114, liquidation=0, cumQty=40000.0, avgPrice=1.17646, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,049 - INFO - execDetails Execution(execId='0000e215.69a4bc4a.01.01', time=datetime.datetime(2026, 3, 1, 22, 39, 54, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='BOT', shares=120000.0, price=1.17657, permId=62640628, clientId=1, orderId=120, liquidation=0, cumQty=120000.0, avgPrice=1.17657, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,049 - INFO - execDetails Execution(execId='0000e215.69a4bc98.01.01', time=datetime.datetime(2026, 3, 1, 22, 49, 13, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=40000.0, price=1.17741, permId=62640629, clientId=1, orderId=123, liquidation=0, cumQty=40000.0, avgPrice=1.17741, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,049 - INFO - execDetails Execution(execId='0000e215.69a4bcbc.01.01', time=datetime.datetime(2026, 3, 1, 22, 54, 54, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='BOT', shares=40000.0, price=1.17787, permId=62640630, clientId=1, orderId=125, liquidation=0, cumQty=40000.0, avgPrice=1.17787, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,050 - INFO - execDetails Execution(execId='0000e215.69a4bcc7.01.01', time=datetime.datetime(2026, 3, 1, 22, 56, 27, tzinfo=datetime.timezone.utc), acctNumber='DUM847254', exchange='IDEALPRO', side='SLD', shares=50000.0, price=1.17776, permId=62640631, clientId=1, orderId=126, liquidation=0, cumQty=50000.0, avgPrice=1.17776, orderRef='', evRule='', evMultiplier=0.0, modelCode='', lastLiquidity=2, pendingPriceRevision=False)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bad0.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bad1.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bade.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bc4a.01.01', commission=2.389585, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bc98.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bcbc.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,050 - INFO - commissionReport: CommissionReport(execId='0000e215.69a4bcc7.01.01', commission=1.69248, currency='EUR', realizedPNL=0.0, yield_=0.0, yieldRedemptionDate=0)
+2026-03-01 23:48:29,051 - INFO - Synchronization complete
+2026-03-01 23:48:29,051 - INFO - Reconnected successfully on attempt 1
+2026-03-01 23:48:29,152 - INFO - Contract re-qualified: EUR (conId: 12087792)
+2026-03-01 23:48:29,152 - INFO - Reconnected successfully.
+2026-03-01 23:48:29,153 - INFO - Reconciling position state with IB...
+2026-03-01 23:48:29,153 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-01 23:48:29,153 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-01 23:48:29,153 - INFO - Position state verified. Resuming trading.
+2026-03-01 23:48:37,772 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-01 23:53:38,368 - INFO - Waiting for new bar... (last: 2026-03-01 17:15:00-05:00, price: 1.17608)
+2026-03-02 00:03:39,069 - INFO - New bar: 2026-03-01 19:00:00-05:00 | O=1.17592 H=1.17619 L=1.17562 C=1.17593
+2026-03-02 00:18:39,962 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17744)
+2026-03-02 00:43:41,287 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17695)
+2026-03-02 01:08:42,650 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17799)
+2026-03-02 01:33:44,225 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17893)
+2026-03-02 01:58:45,536 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17904)
+2026-03-02 02:23:46,840 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17841)
+2026-03-02 02:48:48,208 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17860)
+2026-03-02 03:13:49,620 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17905)
+2026-03-02 03:38:50,849 - INFO - Waiting for new bar... (last: 2026-03-01 19:00:00-05:00, price: 1.17924)
+2026-03-02 04:03:52,125 - INFO - New bar: 2026-03-01 23:00:00-05:00 | O=1.17888 H=1.17904 L=1.17887 C=1.17901
+2026-03-02 04:28:53,427 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17865)
+2026-03-02 04:30:06,222 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 04:30:06,904 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 04:45:32,734 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 04:45:33,347 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 04:53:54,639 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17837)
+2026-03-02 05:01:36,932 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-02 05:01:44,719 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-02 05:04:37,259 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-02 05:04:37,908 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-02 05:18:56,004 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17763)
+2026-03-02 05:22:28,270 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:22:28,889 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:22:40,224 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:22:43,315 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:22:44,540 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:22:49,529 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:22:59,551 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:23:11,822 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:23:12,895 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-02 05:23:25,321 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:23:46,755 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-02 05:24:14,922 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-02 05:24:14,941 - ERROR - Error handling fields: ['10', '8521', 'EUR', 'CASH', '', '0', '', 'IDEALPRO', 'USD', 'EUR.USD', 'EUR.USD', 'EUR.USD', '12087792', '0.00005', '', 'ACTIVETIM,AD,ADJUST,ALERT,ALGO,ALLOC,AVGCOST,BASKET,BENCHPX,CASHQTY,COND,CONDORDER,DAY,DEACT,DEACTDIS,DEACTEOD,GAT,GTC,GTD,GTT,HID,IOC,LIT,LMT,MIT,MKT,NONALGO,OCA,REL,RELPCTOFS,SCALE,SCALERST,STP,STPLMT,TRAIL,TRAILLIT,TRAILLMT,TRAILMIT,WHATIF', 'IDEALPRO', '1', '0', 'European Monetary Union Euro', '', '', '', '', '', 'US/Eastern', ';20260301:1715-20260302:1700;20260302:1715-20260303:1700;20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700', ';20260301:1715-20260302:1700;20260302:1715-20260303:1700;20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700', '', '', '0', '4', '', '', '3188', '', '', '0.01', '0.01', '0.01']
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 181, in interpret
+    handler(fields)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 344, in contractDetails
+    self.wrapper.contractDetails(int(reqId), cd)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/wrapper.py", line 874, in contractDetails
+    self._results[reqId].append(contractDetails)
+    ~~~~~~~~~~~~~^^^^^^^
+KeyError: 8521
+2026-03-02 05:24:14,945 - ERROR - Error 1102, reqId -1: Connectivity between IBKR and Trader Workstation has been restored - data maintained. All data farms are connected: usfarm; cashhmds; ushmds; secdefnj.
+2026-03-02 05:24:14,946 - WARNING - Connectivity restored (Error 1102). Scheduling position reconciliation.
+2026-03-02 05:29:15,212 - INFO - Running scheduled reconciliation after connectivity restore...
+2026-03-02 05:29:15,213 - INFO - Reconciling position state with IB...
+2026-03-02 05:29:15,213 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-02 05:29:15,214 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-02 05:32:06,701 - INFO - position: Position(account='DUM847254', contract=Forex('EURUSD', conId=12087792, localSymbol='EUR.USD', tradingClass='EUR.USD'), position=0.0, avgCost=0.0)
+2026-03-02 05:44:16,206 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17745)
+2026-03-02 06:09:17,547 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17599)
+2026-03-02 06:34:18,921 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17404)
+2026-03-02 06:59:20,267 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17315)
+2026-03-02 07:24:21,592 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17254)
+2026-03-02 07:49:23,009 - INFO - Waiting for new bar... (last: 2026-03-01 23:00:00-05:00, price: 1.17104)
+2026-03-02 08:04:23,777 - INFO - New bar: 2026-03-02 03:00:00-05:00 | O=1.17163 H=1.17234 L=1.17156 C=1.17179
+2026-03-02 08:14:24,315 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17145)
+2026-03-02 08:39:25,664 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17007)
+2026-03-02 09:04:27,066 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17314)
+2026-03-02 09:29:28,408 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17373)
+2026-03-02 09:54:29,776 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17335)
+2026-03-02 09:57:29,441 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-02 09:57:43,561 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 09:57:54,916 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-02 09:58:16,829 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 09:58:19,253 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-02 09:58:19,717 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 09:58:33,316 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-02 09:59:29,733 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 10:00:19,064 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-02 10:00:19,698 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-02 10:00:29,096 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 10:01:29,718 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-02 10:01:39,113 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 10:01:43,720 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 10:01:53,215 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-02 10:02:07,782 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-02 10:19:32,120 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17431)
+2026-03-02 10:44:33,552 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17433)
+2026-03-02 11:09:34,808 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17344)
+2026-03-02 11:34:36,012 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17298)
+2026-03-02 11:59:37,201 - INFO - Waiting for new bar... (last: 2026-03-02 03:00:00-05:00, price: 1.17342)
+2026-03-02 12:04:37,489 - INFO - New bar: 2026-03-02 07:00:00-05:00 | O=1.17333 H=1.17341 L=1.17301 C=1.17335
+2026-03-02 12:24:38,466 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17204)
+2026-03-02 12:49:39,670 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17078)
+2026-03-02 13:14:40,885 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17056)
+2026-03-02 13:39:42,118 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17034)
+2026-03-02 14:04:43,357 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.16995)
+2026-03-02 14:07:53,872 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 14:08:25,267 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-02 14:08:43,480 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-02 14:08:44,004 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-02 14:08:50,697 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 14:08:57,673 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-02 14:09:03,030 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-02 14:09:03,630 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-02 14:29:44,566 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17060)
+2026-03-02 14:54:45,865 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17196)
+2026-03-02 15:19:47,150 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.17063)
+2026-03-02 15:44:48,409 - INFO - Waiting for new bar... (last: 2026-03-02 07:00:00-05:00, price: 1.16969)
+2026-03-02 16:04:49,410 - INFO - New bar: 2026-03-02 11:00:00-05:00 | O=1.16802 H=1.16810 L=1.16762 C=1.16780
+2026-03-02 16:09:49,682 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.16762)
+2026-03-02 16:34:50,928 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.16794)
+2026-03-02 16:59:52,194 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.16891)
+2026-03-02 17:24:53,489 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.17026)
+2026-03-02 17:49:54,740 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.16964)
+2026-03-02 18:14:55,951 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.17022)
+2026-03-02 18:39:58,622 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.16880)
+2026-03-02 19:04:59,878 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.16978)
+2026-03-02 19:30:01,084 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.17086)
+2026-03-02 19:55:02,462 - INFO - Waiting for new bar... (last: 2026-03-02 11:00:00-05:00, price: 1.17118)
+2026-03-02 20:05:03,021 - INFO - New bar: 2026-03-02 15:00:00-05:00 | O=1.17111 H=1.17132 L=1.17074 C=1.17081
+2026-03-02 20:20:03,847 - INFO - Waiting for new bar... (last: 2026-03-02 15:00:00-05:00, price: 1.16863)
+2026-03-02 20:45:05,197 - INFO - Waiting for new bar... (last: 2026-03-02 15:00:00-05:00, price: 1.16919)
+2026-03-02 20:52:07,917 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-02 20:52:16,732 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-02 21:05:00,936 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-02 21:05:08,090 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 21:10:07,195 - INFO - Waiting for new bar... (last: 2026-03-02 15:00:00-05:00, price: 1.16922)
+2026-03-02 21:35:08,498 - INFO - Waiting for new bar... (last: 2026-03-02 15:00:00-05:00, price: 1.16909)
+2026-03-02 22:00:09,774 - INFO - Waiting for new bar... (last: 2026-03-02 15:00:00-05:00, price: 1.16877)
+2026-03-02 22:15:10,601 - INFO - New bar: 2026-03-02 17:15:00-05:00 | O=1.16865 H=1.16873 L=1.16865 C=1.16868
+2026-03-02 22:25:11,235 - INFO - Waiting for new bar... (last: 2026-03-02 17:15:00-05:00, price: 1.16885)
+2026-03-02 22:50:12,545 - INFO - Waiting for new bar... (last: 2026-03-02 17:15:00-05:00, price: 1.16872)
+2026-03-02 23:15:13,811 - INFO - Waiting for new bar... (last: 2026-03-02 17:15:00-05:00, price: 1.16949)
+2026-03-02 23:40:15,153 - INFO - Waiting for new bar... (last: 2026-03-02 17:15:00-05:00, price: 1.16962)
+2026-03-02 23:45:00,310 - ERROR - Peer closed connection.
+2026-03-02 23:45:15,168 - WARNING - Connection lost detected!
+2026-03-02 23:45:15,168 - INFO - Attempting automatic reconnection...
+2026-03-02 23:45:15,168 - INFO - Reconnection attempt 1/10 (waiting 1s before trying)...
+2026-03-02 23:45:16,170 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-02 23:45:16,172 - INFO - Disconnecting
+2026-03-02 23:45:16,172 - ERROR - API connection failed: OSError("Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)")
+2026-03-02 23:45:16,172 - WARNING - Reconnection attempt 1 failed: Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)
+2026-03-02 23:45:16,172 - INFO - Reconnection attempt 2/10 (waiting 2s before trying)...
+2026-03-02 23:45:18,174 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-02 23:45:18,175 - INFO - Disconnecting
+2026-03-02 23:45:18,175 - ERROR - API connection failed: OSError("Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)")
+2026-03-02 23:45:18,175 - WARNING - Reconnection attempt 2 failed: Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)
+2026-03-02 23:45:18,175 - INFO - Reconnection attempt 3/10 (waiting 4s before trying)...
+2026-03-02 23:45:22,176 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-02 23:45:22,177 - INFO - Disconnecting
+2026-03-02 23:45:22,177 - ERROR - API connection failed: OSError("Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)")
+2026-03-02 23:45:22,178 - WARNING - Reconnection attempt 3 failed: Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)
+2026-03-02 23:45:22,178 - INFO - Reconnection attempt 4/10 (waiting 8s before trying)...
+2026-03-02 23:45:30,186 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-02 23:45:30,187 - INFO - Connected
+2026-03-02 23:45:30,342 - INFO - Logged on to server version 178
+2026-03-02 23:45:30,476 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-02 23:45:30,476 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-02 23:45:30,477 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-02 23:45:30,477 - INFO - API connection ready
+2026-03-02 23:45:30,982 - INFO - Synchronization complete
+2026-03-02 23:45:30,982 - INFO - Reconnected successfully on attempt 4
+2026-03-02 23:45:31,276 - INFO - Contract re-qualified: EUR (conId: 12087792)
+2026-03-02 23:45:31,276 - INFO - Reconnected successfully.
+2026-03-02 23:45:31,277 - INFO - Reconciling position state with IB...
+2026-03-02 23:45:31,277 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-02 23:45:31,277 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-02 23:45:31,277 - INFO - Position state verified. Resuming trading.
+2026-03-02 23:45:40,234 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-03 00:00:41,442 - INFO - New bar: 2026-03-02 19:00:00-05:00 | O=1.16947 H=1.16949 L=1.16935 C=1.16937
+2026-03-03 00:25:42,828 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16909)
+2026-03-03 00:50:44,132 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16938)
+2026-03-03 01:15:45,495 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16996)
+2026-03-03 01:40:46,886 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.17023)
+2026-03-03 02:05:48,123 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16953)
+2026-03-03 02:30:49,520 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16949)
+2026-03-03 02:55:50,824 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16963)
+2026-03-03 03:20:52,325 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16909)
+2026-03-03 03:45:53,717 - INFO - Waiting for new bar... (last: 2026-03-02 19:00:00-05:00, price: 1.16938)
+2026-03-03 04:00:54,521 - INFO - New bar: 2026-03-02 23:00:00-05:00 | O=1.16904 H=1.16909 L=1.16902 C=1.16903
+2026-03-03 04:10:55,040 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16918)
+2026-03-03 04:30:05,761 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-03 04:30:06,432 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-03 04:35:56,365 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16892)
+2026-03-03 04:45:33,396 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-03 04:45:33,995 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-03 05:00:57,668 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16803)
+2026-03-03 05:02:50,684 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-03 05:03:05,000 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-03 05:04:20,844 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-03 05:04:21,501 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-03 05:17:18,029 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-03 05:17:19,328 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-03 05:22:51,342 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-03 05:22:52,675 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-03 05:25:58,974 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16803)
+2026-03-03 05:45:01,994 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:02,660 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:11,718 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:16,807 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:18,450 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:23,934 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:34,426 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:45,817 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:45:55,749 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:46:14,441 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:46:34,315 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:46:59,826 - WARNING - reqHistoricalData: Timeout for Forex('EURUSD', conId=12087792, exchange='IDEALPRO', localSymbol='EUR.USD', tradingClass='EUR.USD')
+2026-03-03 05:46:59,826 - WARNING - No bar data returned
+2026-03-03 05:46:59,852 - ERROR - Error 366, reqId 8594: No historical data query found for ticker id:8594, contract: Forex('EURUSD', conId=12087792, exchange='IDEALPRO', localSymbol='EUR.USD', tradingClass='EUR.USD')
+2026-03-03 05:47:01,560 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:47:33,921 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:48:04,517 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:48:42,873 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:49:14,319 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-03 05:49:48,014 - ERROR - Error 1102, reqId -1: Connectivity between IBKR and Trader Workstation has been restored - data maintained. All data farms are connected: usfarm; cashhmds; ushmds; secdefnj.
+2026-03-03 05:49:48,015 - WARNING - Connectivity restored (Error 1102). Scheduling position reconciliation.
+2026-03-03 05:49:48,124 - ERROR - Error handling fields: ['10', '8521', 'EUR', 'CASH', '', '0', '', 'IDEALPRO', 'USD', 'EUR.USD', 'EUR.USD', 'EUR.USD', '12087792', '0.00005', '', 'ACTIVETIM,AD,ADJUST,ALERT,ALGO,ALLOC,AVGCOST,BASKET,BENCHPX,CASHQTY,COND,CONDORDER,DAY,DEACT,DEACTDIS,DEACTEOD,GAT,GTC,GTD,GTT,HID,IOC,LIT,LMT,MIT,MKT,NONALGO,OCA,REL,RELPCTOFS,SCALE,SCALERST,STP,STPLMT,TRAIL,TRAILLIT,TRAILLMT,TRAILMIT,WHATIF', 'IDEALPRO', '1', '0', 'European Monetary Union Euro', '', '', '', '', '', 'US/Eastern', '20260301:1715-20260302:1700;20260302:1715-20260303:1700;20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700', '20260301:1715-20260302:1700;20260302:1715-20260303:1700;20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700', '', '', '0', '4', '', '', '3188', '', '', '0.01', '0.01', '0.01']
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 181, in interpret
+    handler(fields)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 344, in contractDetails
+    self.wrapper.contractDetails(int(reqId), cd)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/wrapper.py", line 874, in contractDetails
+    self._results[reqId].append(contractDetails)
+    ~~~~~~~~~~~~~^^^^^^^
+KeyError: 8521
+2026-03-03 05:51:59,829 - INFO - Running scheduled reconciliation after connectivity restore...
+2026-03-03 05:51:59,829 - INFO - Reconciling position state with IB...
+2026-03-03 05:51:59,829 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-03 05:51:59,829 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-03 05:52:00,045 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16688)
+2026-03-03 06:17:01,456 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16656)
+2026-03-03 06:42:02,953 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16665)
+2026-03-03 07:07:04,380 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16630)
+2026-03-03 07:32:05,729 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16552)
+2026-03-03 07:57:07,131 - INFO - Waiting for new bar... (last: 2026-03-02 23:00:00-05:00, price: 1.16465)
+2026-03-03 08:02:07,360 - INFO - New bar: 2026-03-03 03:00:00-05:00 | O=1.16437 H=1.16448 L=1.16412 C=1.16431
+2026-03-03 08:22:08,468 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16362)
+2026-03-03 08:47:09,792 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16249)
+2026-03-03 09:12:11,181 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16261)
+2026-03-03 09:37:12,494 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16094)
+2026-03-03 10:02:13,766 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16088)
+2026-03-03 10:27:15,344 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16027)
+2026-03-03 10:52:16,559 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.16030)
+2026-03-03 11:17:17,917 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.15853)
+2026-03-03 11:42:19,285 - INFO - Waiting for new bar... (last: 2026-03-03 03:00:00-05:00, price: 1.15966)
+2026-03-03 12:02:20,317 - INFO - New bar: 2026-03-03 07:00:00-05:00 | O=1.15974 H=1.15976 L=1.15925 C=1.15928
+2026-03-03 12:07:20,615 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15972)
+2026-03-03 12:32:21,935 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.16040)
+2026-03-03 12:57:23,380 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.16109)
+2026-03-03 13:22:24,768 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.16004)
+2026-03-03 13:47:26,060 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15999)
+2026-03-03 14:12:27,478 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15904)
+2026-03-03 14:37:28,792 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15783)
+2026-03-03 15:02:30,142 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15684)
+2026-03-03 15:27:31,603 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15515)
+2026-03-03 15:52:32,942 - INFO - Waiting for new bar... (last: 2026-03-03 07:00:00-05:00, price: 1.15769)
+2026-03-03 16:02:33,492 - INFO - New bar: 2026-03-03 11:00:00-05:00 | O=1.15728 H=1.15749 L=1.15715 C=1.15724
+2026-03-03 16:17:34,318 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.15919)
+2026-03-03 16:42:35,722 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.15834)
+2026-03-03 17:07:37,071 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.15977)
+2026-03-03 17:11:44,395 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-03 17:11:53,601 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-03 17:12:15,517 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-03 17:12:17,305 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-03 17:32:38,402 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.15936)
+2026-03-03 17:57:39,853 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.15891)
+2026-03-03 18:08:03,643 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-03 18:08:04,266 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-03 18:23:09,198 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.16024)
+2026-03-03 18:48:10,572 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.16186)
+2026-03-03 18:59:03,180 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-03 18:59:14,305 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-03 18:59:31,896 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-03 18:59:32,664 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-03 18:59:38,661 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-03 19:00:08,099 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-03 19:13:24,900 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.16077)
+2026-03-03 19:38:26,203 - INFO - Waiting for new bar... (last: 2026-03-03 11:00:00-05:00, price: 1.16139)
+2026-03-03 20:03:27,609 - INFO - New bar: 2026-03-03 15:00:00-05:00 | O=1.16124 H=1.16162 L=1.16112 C=1.16135
+2026-03-03 20:28:28,988 - INFO - Waiting for new bar... (last: 2026-03-03 15:00:00-05:00, price: 1.16235)
+2026-03-03 20:53:30,387 - INFO - Waiting for new bar... (last: 2026-03-03 15:00:00-05:00, price: 1.16148)
+2026-03-03 21:18:31,867 - INFO - Waiting for new bar... (last: 2026-03-03 15:00:00-05:00, price: 1.16132)
+2026-03-03 21:43:33,235 - INFO - Waiting for new bar... (last: 2026-03-03 15:00:00-05:00, price: 1.16131)
+2026-03-03 22:08:34,569 - INFO - Waiting for new bar... (last: 2026-03-03 15:00:00-05:00, price: 1.16146)
+2026-03-03 22:18:35,243 - INFO - New bar: 2026-03-03 17:15:00-05:00 | O=1.16142 H=1.16142 L=1.16104 C=1.16124
+2026-03-03 22:33:36,055 - INFO - Waiting for new bar... (last: 2026-03-03 17:15:00-05:00, price: 1.16120)
+2026-03-03 22:58:37,406 - INFO - Waiting for new bar... (last: 2026-03-03 17:15:00-05:00, price: 1.16121)
+2026-03-03 23:23:38,686 - INFO - Waiting for new bar... (last: 2026-03-03 17:15:00-05:00, price: 1.16174)
+2026-03-03 23:45:00,555 - ERROR - Peer closed connection.
+2026-03-03 23:48:39,884 - WARNING - Connection lost detected!
+2026-03-03 23:48:39,885 - INFO - Attempting automatic reconnection...
+2026-03-03 23:48:39,885 - INFO - Reconnection attempt 1/10 (waiting 1s before trying)...
+2026-03-03 23:48:40,886 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-03 23:48:40,887 - INFO - Connected
+2026-03-03 23:48:41,047 - INFO - Logged on to server version 178
+2026-03-03 23:48:41,212 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-03 23:48:41,213 - INFO - API connection ready
+2026-03-03 23:48:41,216 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-03 23:48:41,260 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-03 23:48:41,927 - INFO - Synchronization complete
+2026-03-03 23:48:41,927 - INFO - Reconnected successfully on attempt 1
+2026-03-03 23:48:42,236 - INFO - Contract re-qualified: EUR (conId: 12087792)
+2026-03-03 23:48:42,238 - INFO - Reconnected successfully.
+2026-03-03 23:48:42,238 - INFO - Reconciling position state with IB...
+2026-03-03 23:48:42,238 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-03 23:48:42,238 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-03 23:48:42,238 - INFO - Position state verified. Resuming trading.
+2026-03-03 23:48:50,992 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-04 00:03:52,362 - INFO - New bar: 2026-03-03 19:00:00-05:00 | O=1.16108 H=1.16111 L=1.16047 C=1.16066
+2026-03-04 00:08:52,661 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.16051)
+2026-03-04 00:33:54,088 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.16047)
+2026-03-04 00:58:55,431 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.15939)
+2026-03-04 01:23:56,826 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.15813)
+2026-03-04 01:48:58,151 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.15926)
+2026-03-04 02:13:59,469 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.15976)
+2026-03-04 02:39:00,879 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.15963)
+2026-03-04 03:04:02,257 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.15956)
+2026-03-04 03:24:37,257 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-04 03:24:37,285 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-04 03:24:37,902 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-04 03:24:37,918 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-04 03:29:50,570 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.16002)
+2026-03-04 03:54:51,903 - INFO - Waiting for new bar... (last: 2026-03-03 19:00:00-05:00, price: 1.16075)
+2026-03-04 04:04:52,367 - INFO - New bar: 2026-03-03 23:00:00-05:00 | O=1.16085 H=1.16101 L=1.16084 C=1.16091
+2026-03-04 04:19:53,186 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.16084)
+2026-03-04 04:30:05,611 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-04 04:30:06,287 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-04 04:31:02,930 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-04 04:31:03,696 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-04 04:44:54,552 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.15964)
+2026-03-04 05:04:21,279 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-04 05:04:22,233 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-04 05:04:51,274 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-04 05:04:51,918 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-04 05:09:55,867 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.15959)
+2026-03-04 05:12:23,512 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-04 05:12:24,720 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-04 05:17:23,872 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-04 05:17:25,035 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-04 05:22:57,138 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-04 05:22:59,367 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-04 05:25:18,943 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:25:19,561 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:25:27,617 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:25:31,687 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:25:36,753 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:25:42,621 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:25:52,909 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:26:05,836 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-04 05:26:19,149 - ERROR - Error handling fields: ['10', '8521', 'EUR', 'CASH', '', '0', '', 'IDEALPRO', 'USD', 'EUR.USD', 'EUR.USD', 'EUR.USD', '12087792', '0.00005', '', 'ACTIVETIM,AD,ADJUST,ALERT,ALGO,ALLOC,AVGCOST,BASKET,BENCHPX,CASHQTY,COND,CONDORDER,DAY,DEACT,DEACTDIS,DEACTEOD,GAT,GTC,GTD,GTT,HID,IOC,LIT,LMT,MIT,MKT,NONALGO,OCA,REL,RELPCTOFS,SCALE,SCALERST,STP,STPLMT,TRAIL,TRAILLIT,TRAILLMT,TRAILMIT,WHATIF', 'IDEALPRO', '1', '0', 'European Monetary Union Euro', '', '', '', '', '', 'US/Eastern', '20260302:1715-20260303:1700;20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700;20260307:CLOSED;20260308:1715-20260309:1700', '20260302:1715-20260303:1700;20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700;20260307:CLOSED;20260308:1715-20260309:1700', '', '', '0', '4', '', '', '3188', '', '', '0.01', '0.01', '0.01']
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 181, in interpret
+    handler(fields)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 344, in contractDetails
+    self.wrapper.contractDetails(int(reqId), cd)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/wrapper.py", line 874, in contractDetails
+    self._results[reqId].append(contractDetails)
+    ~~~~~~~~~~~~~^^^^^^^
+KeyError: 8521
+2026-03-04 05:26:19,152 - ERROR - Error 1102, reqId -1: Connectivity between IBKR and Trader Workstation has been restored - data maintained. All data farms are connected: usfarm; cashhmds; ushmds; secdefnj.
+2026-03-04 05:26:19,152 - WARNING - Connectivity restored (Error 1102). Scheduling position reconciliation.
+2026-03-04 05:29:56,712 - INFO - Running scheduled reconciliation after connectivity restore...
+2026-03-04 05:29:56,712 - INFO - Reconciling position state with IB...
+2026-03-04 05:29:56,712 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-04 05:29:56,712 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-04 05:34:57,238 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.15906)
+2026-03-04 05:59:58,694 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.15945)
+2026-03-04 06:25:00,114 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.16000)
+2026-03-04 06:50:01,388 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.16156)
+2026-03-04 07:15:02,892 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.16166)
+2026-03-04 07:40:04,263 - INFO - Waiting for new bar... (last: 2026-03-03 23:00:00-05:00, price: 1.16226)
+2026-03-04 08:00:05,341 - INFO - New bar: 2026-03-04 03:00:00-05:00 | O=1.16159 H=1.16165 L=1.16153 C=1.16162
+2026-03-04 08:05:05,570 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16081)
+2026-03-04 08:30:06,879 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.15990)
+2026-03-04 08:55:08,128 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16026)
+2026-03-04 09:20:09,403 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16153)
+2026-03-04 09:45:10,806 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16147)
+2026-03-04 10:10:12,267 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16411)
+2026-03-04 10:35:13,639 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16297)
+2026-03-04 11:00:15,026 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16336)
+2026-03-04 11:25:16,472 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16542)
+2026-03-04 11:50:17,829 - INFO - Waiting for new bar... (last: 2026-03-04 03:00:00-05:00, price: 1.16358)
+2026-03-04 12:00:18,356 - INFO - New bar: 2026-03-04 07:00:00-05:00 | O=1.16352 H=1.16362 L=1.16345 C=1.16345
+2026-03-04 12:15:19,213 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16488)
+2026-03-04 12:40:20,669 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16338)
+2026-03-04 13:05:22,043 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16410)
+2026-03-04 13:30:23,404 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16439)
+2026-03-04 13:55:24,855 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16342)
+2026-03-04 14:20:26,076 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16409)
+2026-03-04 14:45:27,359 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16248)
+2026-03-04 15:10:28,691 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16232)
+2026-03-04 15:35:30,066 - INFO - Waiting for new bar... (last: 2026-03-04 07:00:00-05:00, price: 1.16376)
+2026-03-04 16:00:31,370 - INFO - New bar: 2026-03-04 11:00:00-05:00 | O=1.16402 H=1.16410 L=1.16402 C=1.16406
+2026-03-04 16:25:32,598 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16306)
+2026-03-04 16:50:33,842 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16373)
+2026-03-04 17:15:35,175 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16342)
+2026-03-04 17:40:36,535 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16297)
+2026-03-04 18:05:37,751 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16291)
+2026-03-04 18:30:39,038 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16264)
+2026-03-04 18:55:40,342 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16275)
+2026-03-04 19:20:41,625 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16288)
+2026-03-04 19:45:42,971 - INFO - Waiting for new bar... (last: 2026-03-04 11:00:00-05:00, price: 1.16323)
+2026-03-04 20:00:43,830 - INFO - New bar: 2026-03-04 15:00:00-05:00 | O=1.16398 H=1.16410 L=1.16398 C=1.16404
+2026-03-04 20:10:44,309 - INFO - Waiting for new bar... (last: 2026-03-04 15:00:00-05:00, price: 1.16402)
+2026-03-04 20:35:45,539 - INFO - Waiting for new bar... (last: 2026-03-04 15:00:00-05:00, price: 1.16426)
+2026-03-04 21:00:46,921 - INFO - Waiting for new bar... (last: 2026-03-04 15:00:00-05:00, price: 1.16401)
+2026-03-04 21:25:48,230 - INFO - Waiting for new bar... (last: 2026-03-04 15:00:00-05:00, price: 1.16393)
+2026-03-04 21:50:49,477 - INFO - Waiting for new bar... (last: 2026-03-04 15:00:00-05:00, price: 1.16361)
+2026-03-04 22:15:50,834 - INFO - New bar: 2026-03-04 17:15:00-05:00 | O=1.16310 H=1.16335 L=1.16310 C=1.16329
+2026-03-04 22:15:50,836 - INFO - Status: Price=1.16329, Position=FLAT, Bars=113, P&L=EUR 0.00, Remaining=49.4h
+2026-03-04 22:40:52,108 - INFO - Waiting for new bar... (last: 2026-03-04 17:15:00-05:00, price: 1.16339)
+2026-03-04 23:05:53,403 - INFO - Waiting for new bar... (last: 2026-03-04 17:15:00-05:00, price: 1.16376)
+2026-03-04 23:30:54,774 - INFO - Waiting for new bar... (last: 2026-03-04 17:15:00-05:00, price: 1.16366)
+2026-03-04 23:45:00,495 - ERROR - Peer closed connection.
+2026-03-04 23:45:55,360 - WARNING - Connection lost detected!
+2026-03-04 23:45:55,360 - INFO - Attempting automatic reconnection...
+2026-03-04 23:45:55,360 - INFO - Reconnection attempt 1/10 (waiting 1s before trying)...
+2026-03-04 23:45:56,361 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-04 23:45:56,362 - INFO - Connected
+2026-03-04 23:45:56,584 - INFO - Logged on to server version 178
+2026-03-04 23:45:56,716 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-04 23:45:56,716 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-04 23:45:56,717 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-04 23:45:56,717 - INFO - API connection ready
+2026-03-04 23:45:57,352 - INFO - Synchronization complete
+2026-03-04 23:45:57,352 - INFO - Reconnected successfully on attempt 1
+2026-03-04 23:45:57,952 - INFO - Contract re-qualified: EUR (conId: 12087792)
+2026-03-04 23:45:57,952 - INFO - Reconnected successfully.
+2026-03-04 23:45:57,952 - INFO - Reconciling position state with IB...
+2026-03-04 23:45:57,953 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-04 23:45:57,953 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-04 23:45:57,953 - INFO - Position state verified. Resuming trading.
+2026-03-04 23:46:06,848 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-04 23:51:07,373 - INFO - Waiting for new bar... (last: 2026-03-04 17:15:00-05:00, price: 1.16345)
+2026-03-05 00:01:08,070 - INFO - New bar: 2026-03-04 19:00:00-05:00 | O=1.16349 H=1.16352 L=1.16332 C=1.16334
+2026-03-05 00:16:08,946 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16383)
+2026-03-05 00:41:10,427 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16453)
+2026-03-05 01:06:11,906 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16386)
+2026-03-05 01:31:13,348 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16448)
+2026-03-05 01:56:14,745 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16292)
+2026-03-05 02:21:16,088 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16295)
+2026-03-05 02:46:17,551 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16284)
+2026-03-05 03:11:18,925 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16210)
+2026-03-05 03:36:20,248 - INFO - Waiting for new bar... (last: 2026-03-04 19:00:00-05:00, price: 1.16117)
+2026-03-05 04:01:21,676 - INFO - New bar: 2026-03-04 23:00:00-05:00 | O=1.16132 H=1.16132 L=1.16107 C=1.16108
+2026-03-05 04:01:21,677 - INFO - Status: Price=1.16108, Position=FLAT, Bars=115, P&L=EUR 0.00, Remaining=43.6h
+2026-03-05 04:26:23,083 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.16118)
+2026-03-05 04:32:21,406 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-05 04:32:22,079 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 04:45:04,956 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-05 04:45:05,576 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 04:46:05,311 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-05 04:46:05,960 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 04:51:24,363 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.16083)
+2026-03-05 05:00:50,859 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-05 05:00:59,424 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-05 05:01:05,941 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-05 05:01:07,232 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-05 05:12:31,188 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-05 05:12:32,565 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-05 05:16:25,855 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.16111)
+2026-03-05 05:23:04,571 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-05 05:23:06,332 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-05 05:40:35,123 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:40:36,251 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:40:44,758 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:40:51,113 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:40:56,756 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:41:00,116 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:41:07,536 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:41:17,651 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:41:33,065 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:41:58,079 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:42:18,030 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:42:26,942 - WARNING - reqHistoricalData: Timeout for Forex('EURUSD', conId=12087792, exchange='IDEALPRO', localSymbol='EUR.USD', tradingClass='EUR.USD')
+2026-03-05 05:42:26,943 - WARNING - No bar data returned
+2026-03-05 05:42:26,969 - ERROR - Error 366, reqId 8593: No historical data query found for ticker id:8593, contract: Forex('EURUSD', conId=12087792, exchange='IDEALPRO', localSymbol='EUR.USD', tradingClass='EUR.USD')
+2026-03-05 05:42:52,302 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-05 05:43:19,461 - ERROR - Error handling fields: ['10', '8521', 'EUR', 'CASH', '', '0', '', 'IDEALPRO', 'USD', 'EUR.USD', 'EUR.USD', 'EUR.USD', '12087792', '0.00005', '', 'ACTIVETIM,AD,ADJUST,ALERT,ALGO,ALLOC,AVGCOST,BASKET,BENCHPX,CASHQTY,COND,CONDORDER,DAY,DEACT,DEACTDIS,DEACTEOD,GAT,GTC,GTD,GTT,HID,IOC,LIT,LMT,MIT,MKT,NONALGO,OCA,REL,RELPCTOFS,SCALE,SCALERST,STP,STPLMT,TRAIL,TRAILLIT,TRAILLMT,TRAILMIT,WHATIF', 'IDEALPRO', '1', '0', 'European Monetary Union Euro', '', '', '', '', '', 'US/Eastern', '20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700;20260307:CLOSED;20260308:1715-20260309:1700;20260309:1715-20260310:1700', '20260303:1715-20260304:1700;20260304:1715-20260305:1700;20260305:1715-20260306:1700;20260307:CLOSED;20260308:1715-20260309:1700;20260309:1715-20260310:1700', '', '', '0', '4', '', '', '3188', '', '', '0.01', '0.01', '0.01']
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 181, in interpret
+    handler(fields)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 344, in contractDetails
+    self.wrapper.contractDetails(int(reqId), cd)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/wrapper.py", line 874, in contractDetails
+    self._results[reqId].append(contractDetails)
+    ~~~~~~~~~~~~~^^^^^^^
+KeyError: 8521
+2026-03-05 05:43:19,465 - ERROR - Error 1102, reqId -1: Connectivity between IBKR and Trader Workstation has been restored - data maintained. All data farms are connected: usfarm; cashhmds; ushmds; secdefnj.
+2026-03-05 05:43:19,466 - WARNING - Connectivity restored (Error 1102). Scheduling position reconciliation.
+2026-03-05 05:47:27,003 - INFO - Running scheduled reconciliation after connectivity restore...
+2026-03-05 05:47:27,003 - INFO - Reconciling position state with IB...
+2026-03-05 05:47:27,003 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-05 05:47:27,003 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-05 06:07:28,307 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.15921)
+2026-03-05 06:32:29,605 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.15934)
+2026-03-05 06:57:30,959 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.16034)
+2026-03-05 07:22:32,295 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.16064)
+2026-03-05 07:47:33,556 - INFO - Waiting for new bar... (last: 2026-03-04 23:00:00-05:00, price: 1.16114)
+2026-03-05 08:02:34,348 - INFO - New bar: 2026-03-05 03:00:00-05:00 | O=1.16050 H=1.16051 L=1.15975 C=1.15986
+2026-03-05 08:12:34,930 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.15925)
+2026-03-05 08:37:36,207 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.15914)
+2026-03-05 09:02:37,480 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.15980)
+2026-03-05 09:27:38,834 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16273)
+2026-03-05 09:52:40,149 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16207)
+2026-03-05 10:17:41,410 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16233)
+2026-03-05 10:42:42,818 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16088)
+2026-03-05 11:07:44,091 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16123)
+2026-03-05 11:32:45,334 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16066)
+2026-03-05 11:57:46,703 - INFO - Waiting for new bar... (last: 2026-03-05 03:00:00-05:00, price: 1.16119)
+2026-03-05 12:02:46,927 - INFO - New bar: 2026-03-05 07:00:00-05:00 | O=1.16114 H=1.16126 L=1.16094 C=1.16105
+2026-03-05 12:22:48,062 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.16216)
+2026-03-05 12:47:49,424 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.16186)
+2026-03-05 13:12:50,785 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.16227)
+2026-03-05 13:37:52,183 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.16061)
+2026-03-05 14:02:53,490 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.16003)
+2026-03-05 14:27:54,886 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.15979)
+2026-03-05 14:52:56,183 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.16006)
+2026-03-05 15:17:57,491 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.15952)
+2026-03-05 15:42:58,889 - INFO - Waiting for new bar... (last: 2026-03-05 07:00:00-05:00, price: 1.15744)
+2026-03-05 16:03:00,000 - INFO - New bar: 2026-03-05 11:00:00-05:00 | O=1.15831 H=1.15858 L=1.15804 C=1.15858
+2026-03-05 16:08:00,288 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15717)
+2026-03-05 16:33:01,582 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15688)
+2026-03-05 16:56:05,708 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-05 16:56:16,365 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-05 16:56:58,073 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-05 16:57:07,843 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-05 16:57:09,042 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-05 16:58:09,816 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-05 16:58:58,120 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 16:59:02,750 - WARNING - reqHistoricalData: Timeout for Forex('EURUSD', conId=12087792, exchange='IDEALPRO', localSymbol='EUR.USD', tradingClass='EUR.USD')
+2026-03-05 16:59:02,750 - WARNING - No bar data returned
+2026-03-05 16:59:02,764 - ERROR - Error 162, reqId 8729: Historical Market Data Service error message:API historical data query cancelled: 8729, contract: Forex('EURUSD', conId=12087792, exchange='IDEALPRO', localSymbol='EUR.USD', tradingClass='EUR.USD')
+2026-03-05 16:59:06,671 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-05 16:59:08,088 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-05 16:59:09,010 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-05 17:04:58,978 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-05 17:05:19,062 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-05 17:05:31,341 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 17:05:48,196 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-05 17:24:04,037 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15870)
+2026-03-05 17:49:05,365 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15810)
+2026-03-05 18:14:06,733 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15850)
+2026-03-05 18:39:08,164 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15877)
+2026-03-05 19:04:09,417 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15869)
+2026-03-05 19:29:10,574 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15783)
+2026-03-05 19:54:11,860 - INFO - Waiting for new bar... (last: 2026-03-05 11:00:00-05:00, price: 1.15725)
+2026-03-05 20:04:12,298 - INFO - New bar: 2026-03-05 15:00:00-05:00 | O=1.15730 H=1.15734 L=1.15702 C=1.15708
+2026-03-05 20:19:13,001 - INFO - Waiting for new bar... (last: 2026-03-05 15:00:00-05:00, price: 1.16002)
+2026-03-05 20:44:29,136 - INFO - Waiting for new bar... (last: 2026-03-05 15:00:00-05:00, price: 1.16064)
+2026-03-05 21:09:30,499 - INFO - Waiting for new bar... (last: 2026-03-05 15:00:00-05:00, price: 1.16090)
+2026-03-05 21:34:31,723 - INFO - Waiting for new bar... (last: 2026-03-05 15:00:00-05:00, price: 1.16037)
+2026-03-05 21:59:32,926 - INFO - Waiting for new bar... (last: 2026-03-05 15:00:00-05:00, price: 1.16084)
+2026-03-05 22:19:34,051 - INFO - New bar: 2026-03-05 17:15:00-05:00 | O=1.16073 H=1.16084 L=1.16071 C=1.16073
+2026-03-05 22:24:34,327 - INFO - Waiting for new bar... (last: 2026-03-05 17:15:00-05:00, price: 1.16097)
+2026-03-05 22:29:41,504 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-05 22:29:58,385 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-05 22:29:59,484 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-05 22:30:01,733 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 22:50:11,167 - INFO - Waiting for new bar... (last: 2026-03-05 17:15:00-05:00, price: 1.16082)
+2026-03-05 23:15:12,373 - INFO - Waiting for new bar... (last: 2026-03-05 17:15:00-05:00, price: 1.16078)
+2026-03-05 23:40:13,673 - INFO - Waiting for new bar... (last: 2026-03-05 17:15:00-05:00, price: 1.16090)
+2026-03-05 23:45:00,185 - ERROR - Peer closed connection.
+2026-03-05 23:45:13,684 - WARNING - Connection lost detected!
+2026-03-05 23:45:13,684 - INFO - Attempting automatic reconnection...
+2026-03-05 23:45:13,684 - INFO - Reconnection attempt 1/10 (waiting 1s before trying)...
+2026-03-05 23:45:14,686 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-05 23:45:14,687 - INFO - Disconnecting
+2026-03-05 23:45:14,687 - ERROR - API connection failed: OSError("Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)")
+2026-03-05 23:45:14,687 - WARNING - Reconnection attempt 1 failed: Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)
+2026-03-05 23:45:14,687 - INFO - Reconnection attempt 2/10 (waiting 2s before trying)...
+2026-03-05 23:45:16,689 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-05 23:45:16,690 - INFO - Disconnecting
+2026-03-05 23:45:16,691 - ERROR - API connection failed: OSError("Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)")
+2026-03-05 23:45:16,691 - WARNING - Reconnection attempt 2 failed: Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)
+2026-03-05 23:45:16,691 - INFO - Reconnection attempt 3/10 (waiting 4s before trying)...
+2026-03-05 23:45:20,692 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-05 23:45:20,693 - INFO - Disconnecting
+2026-03-05 23:45:20,694 - ERROR - API connection failed: OSError("Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)")
+2026-03-05 23:45:20,694 - WARNING - Reconnection attempt 3 failed: Multiple exceptions: [Errno 111] Connect call failed ('::1', 4002, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 4002)
+2026-03-05 23:45:20,694 - INFO - Reconnection attempt 4/10 (waiting 8s before trying)...
+2026-03-05 23:45:28,702 - INFO - Connecting to localhost:4002 with clientId 753...
+2026-03-05 23:45:28,703 - INFO - Connected
+2026-03-05 23:45:28,859 - INFO - Logged on to server version 178
+2026-03-05 23:45:29,004 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-05 23:45:29,004 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-05 23:45:29,004 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-05 23:45:29,005 - INFO - API connection ready
+2026-03-05 23:45:29,638 - INFO - Synchronization complete
+2026-03-05 23:45:29,638 - INFO - Reconnected successfully on attempt 4
+2026-03-05 23:45:29,992 - INFO - Contract re-qualified: EUR (conId: 12087792)
+2026-03-05 23:45:29,993 - INFO - Reconnected successfully.
+2026-03-05 23:45:29,993 - INFO - Reconciling position state with IB...
+2026-03-05 23:45:29,993 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-05 23:45:29,993 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-05 23:45:29,993 - INFO - Position state verified. Resuming trading.
+2026-03-05 23:45:38,571 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-06 00:00:39,930 - INFO - New bar: 2026-03-05 19:00:00-05:00 | O=1.16067 H=1.16074 L=1.16061 C=1.16074
+2026-03-06 00:00:39,933 - INFO - Status: Price=1.16074, Position=FLAT, Bars=120, P&L=EUR 0.00, Remaining=23.6h
+2026-03-06 00:25:41,436 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16134)
+2026-03-06 00:50:42,936 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16115)
+2026-03-06 01:15:44,347 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16150)
+2026-03-06 01:40:45,775 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16155)
+2026-03-06 02:05:47,190 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16164)
+2026-03-06 02:30:48,570 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16189)
+2026-03-06 02:55:49,991 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16162)
+2026-03-06 03:20:51,588 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16175)
+2026-03-06 03:45:52,966 - INFO - Waiting for new bar... (last: 2026-03-05 19:00:00-05:00, price: 1.16171)
+2026-03-06 04:00:53,771 - INFO - New bar: 2026-03-05 23:00:00-05:00 | O=1.16200 H=1.16202 L=1.16195 C=1.16195
+2026-03-06 04:10:54,383 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16195)
+2026-03-06 04:35:55,779 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16199)
+2026-03-06 04:45:33,673 - INFO - Warning 2157, reqId -1: Sec-def data farm connection is broken:secdefnj
+2026-03-06 04:45:34,314 - INFO - Warning 2158, reqId -1: Sec-def data farm connection is OK:secdefnj
+2026-03-06 05:00:57,136 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16125)
+2026-03-06 05:01:02,791 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:ushmds
+2026-03-06 05:01:06,263 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:ushmds
+2026-03-06 05:01:32,690 - INFO - Warning 2105, reqId -1: HMDS data farm connection is broken:cashhmds
+2026-03-06 05:01:39,142 - INFO - Warning 2106, reqId -1: HMDS data farm connection is OK:cashhmds
+2026-03-06 05:22:36,836 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-06 05:22:38,695 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-06 05:23:09,904 - INFO - Warning 2103, reqId -1: Market data farm connection is broken:usfarm
+2026-03-06 05:23:11,049 - INFO - Warning 2104, reqId -1: Market data farm connection is OK:usfarm
+2026-03-06 05:25:58,533 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16124)
+2026-03-06 05:27:25,515 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:27:26,313 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:27:35,694 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:27:41,723 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:27:43,980 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:27:47,435 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:27:55,695 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:28:09,228 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:28:22,393 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:28:38,220 - ERROR - Error 1100, reqId -1: Connectivity between IBKR and Trader Workstation has been lost.
+2026-03-06 05:29:04,629 - ERROR - Error handling fields: ['10', '8521', 'EUR', 'CASH', '', '0', '', 'IDEALPRO', 'USD', 'EUR.USD', 'EUR.USD', 'EUR.USD', '12087792', '0.00005', '', 'ACTIVETIM,AD,ADJUST,ALERT,ALGO,ALLOC,AVGCOST,BASKET,BENCHPX,CASHQTY,COND,CONDORDER,DAY,DEACT,DEACTDIS,DEACTEOD,GAT,GTC,GTD,GTT,HID,IOC,LIT,LMT,MIT,MKT,NONALGO,OCA,REL,RELPCTOFS,SCALE,SCALERST,STP,STPLMT,TRAIL,TRAILLIT,TRAILLMT,TRAILMIT,WHATIF', 'IDEALPRO', '1', '0', 'European Monetary Union Euro', '', '', '', '', '', 'US/Eastern', '20260304:1715-20260305:1700;20260305:1715-20260306:1700;20260307:CLOSED;20260308:1715-20260309:1700;20260309:1715-20260310:1700;20260310:1715-20260311:1700', '20260304:1715-20260305:1700;20260305:1715-20260306:1700;20260307:CLOSED;20260308:1715-20260309:1700;20260309:1715-20260310:1700;20260310:1715-20260311:1700', '', '', '0', '4', '', '', '3188', '', '', '0.01', '0.01', '0.01']
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 181, in interpret
+    handler(fields)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/decoder.py", line 344, in contractDetails
+    self.wrapper.contractDetails(int(reqId), cd)
+  File "/usr/local/lib/python3.11/site-packages/ib_async/wrapper.py", line 874, in contractDetails
+    self._results[reqId].append(contractDetails)
+    ~~~~~~~~~~~~~^^^^^^^
+KeyError: 8521
+2026-03-06 05:29:04,633 - ERROR - Error 1102, reqId -1: Connectivity between IBKR and Trader Workstation has been restored - data maintained. All data farms are connected: usfarm; cashhmds; ushmds; secdefnj.
+2026-03-06 05:29:04,633 - WARNING - Connectivity restored (Error 1102). Scheduling position reconciliation.
+2026-03-06 05:30:58,628 - INFO - Running scheduled reconciliation after connectivity restore...
+2026-03-06 05:30:58,628 - INFO - Reconciling position state with IB...
+2026-03-06 05:30:58,628 - INFO - Position confirmed: FLAT (no open positions)
+2026-03-06 05:30:58,628 - INFO - Reconciliation complete. Current state: FLAT
+2026-03-06 05:50:59,846 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16086)
+2026-03-06 06:16:01,168 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16049)
+2026-03-06 06:41:02,523 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16086)
+2026-03-06 07:06:03,954 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16097)
+2026-03-06 07:31:05,389 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16120)
+2026-03-06 07:56:06,783 - INFO - Waiting for new bar... (last: 2026-03-05 23:00:00-05:00, price: 1.16128)
+2026-03-06 08:01:07,019 - INFO - New bar: 2026-03-06 03:00:00-05:00 | O=1.16147 H=1.16147 L=1.16116 C=1.16138
+2026-03-06 08:21:08,146 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.16064)
+2026-03-06 08:46:09,466 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.16094)
+2026-03-06 09:11:10,829 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15919)
+2026-03-06 09:36:12,151 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15778)
+2026-03-06 10:01:13,485 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15739)
+2026-03-06 10:26:14,902 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15781)
+2026-03-06 10:51:16,183 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15819)
+2026-03-06 11:16:17,579 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15765)
+2026-03-06 11:41:18,982 - INFO - Waiting for new bar... (last: 2026-03-06 03:00:00-05:00, price: 1.15715)
+2026-03-06 12:01:20,095 - INFO - New bar: 2026-03-06 07:00:00-05:00 | O=1.15626 H=1.15650 L=1.15626 C=1.15644
+2026-03-06 12:06:20,398 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15596)
+2026-03-06 12:31:21,724 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15642)
+2026-03-06 12:56:23,135 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15624)
+2026-03-06 13:21:24,439 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15654)
+2026-03-06 13:46:25,802 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15823)
+2026-03-06 14:11:27,203 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15538)
+2026-03-06 14:36:28,387 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15577)
+2026-03-06 15:01:29,670 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15879)
+2026-03-06 15:26:30,911 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15827)
+2026-03-06 15:51:32,074 - INFO - Waiting for new bar... (last: 2026-03-06 07:00:00-05:00, price: 1.15713)
+2026-03-06 16:01:32,421 - INFO - Approaching weekend. Stopping.
+2026-03-06 16:01:32,421 - INFO - 
+2026-03-06 16:01:32,421 - INFO - ======================================================================
+2026-03-06 16:01:32,421 - INFO - TRADING SESSION SUMMARY
+2026-03-06 16:01:32,421 - INFO - ======================================================================
+2026-03-06 16:01:32,421 - INFO - Timeframe: 4H
+2026-03-06 16:01:32,421 - INFO - Parameters: SMA 20/70, RSI 35/70, Mom 0.0
+2026-03-06 16:01:32,421 - INFO - Duration: 4 days, 16:23:07.999299
+2026-03-06 16:01:32,421 - INFO - Total Bars Collected: 120
+2026-03-06 16:01:32,421 - INFO - Total Trades: 0
+2026-03-06 16:01:32,421 - INFO - Final Capital: EUR 952,192.21
+2026-03-06 16:01:32,421 - INFO - Return: 0.00%
+2026-03-06 16:01:32,421 - INFO - ======================================================================
+2026-03-06 16:01:32,425 - INFO - Disconnecting from localhost:4002, 20.7 kB sent in 205 messages, 2.25 MB received in 47463 messages, session time 58.6 ks.
+2026-03-06 16:01:32,425 - INFO - Disconnecting
+2026-03-06 16:01:32,426 - INFO - Disconnected from IB Gateway
+2026-03-06 16:01:32,426 - INFO - Disconnected.
