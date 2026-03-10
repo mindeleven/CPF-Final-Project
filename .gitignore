@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # temporary migration files
-migration/03*
+migration/*
 # logfiles of local testruns
 deployment/logs/*
 deployment/logs_temp*
