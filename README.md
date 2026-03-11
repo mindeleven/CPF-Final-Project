@@ -61,7 +61,6 @@ CPF-Final-Project/
 ├── docs/                                    # Project documentation
 │   ├── handoffs/                            # Development session handoffs
 │   ├── specifications/                      # Implementation specifications
-│   ├── guides/                              # Implementation guides
 │   └── project-progress.md                  # Development timeline
 │
 ├── modules/                                 # Core implementation modules
@@ -87,9 +86,9 @@ CPF-Final-Project/
 │       └── ma_rsi_momentum.py               # Multi-Indicator Trend-Following Strategy
 │
 └── scripts/                                 # Utility scripts
+    ├── analyze_live_run.py                  # Analyse live trading run logs
     ├── fetch_historical_data.py             # Download data from IB Gateway
-    ├── optimize_parameters.py               # Run grid search optimisation
-    └── regenerate_optimization_results.py   # Re-run optimisation with corrected capital
+    └── regenerate_results_20k.py            # Re-run optimisation with corrected capital
 ```
 
 ---
@@ -123,21 +122,13 @@ pip install -r requirements.txt
 
 4. Configure IB connection — edit `deployment/config_live.py`:
 ```python
-HOST = '127.0.0.1'  # localhost for local testing
-PORT = 4002          # IB Gateway paper trading port
+IB_HOST = 'localhost'  # IB Gateway running on same machine
+IB_PORT = 4002         # Paper trading port (4001 for live)
 ```
 
 ### Running the Notebook
 
 Open `ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb` in JupyterLab. All code cells can be run in sequence. Historical data and optimisation results are pre-computed and stored in `data/`.
-
-### Running Optimisation
-
-```bash
-# Run grid search optimisation
-python scripts/optimize_parameters.py --timeframe 5min
-python scripts/optimize_parameters.py --timeframe 4H
-```
 
 ### Live Trading (Local)
 
@@ -221,33 +212,29 @@ Optimal parameters are invariant to position size and capital ratio. The same pa
 Edit `deployment/config_live.py` to switch between timeframes:
 
 ```python
+# Select timeframe: '5min' or '4H'
+TIMEFRAME = '5min'
+
 # 5-Minute Timeframe (optimised)
-STRATEGY_PARAMS = {
-    'sma_fast': 15,
-    'sma_slow': 70,
-    'rsi_period': 14,
-    'rsi_upper': 75,
-    'rsi_lower': 35,
-    'momentum_period': 10,
-    'momentum_threshold': 0.0,
-}
+# SMA_FAST = 15
+# SMA_SLOW = 70
+# RSI_PERIOD = 14
+# RSI_LOWER = 35
+# RSI_UPPER = 75
+# MOMENTUM_PERIOD = 10
+# MOMENTUM_THRESHOLD = 0.0
 
 # 4-Hour Timeframe (optimised)
-# STRATEGY_PARAMS = {
-#     'sma_fast': 20,
-#     'sma_slow': 70,
-#     'rsi_period': 14,
-#     'rsi_upper': 70,
-#     'rsi_lower': 35,
-#     'momentum_period': 10,
-#     'momentum_threshold': 0.0,
-# }
+# SMA_FAST = 20
+# SMA_SLOW = 70
+# RSI_PERIOD = 14
+# RSI_LOWER = 35
+# RSI_UPPER = 70
+# MOMENTUM_PERIOD = 10
+# MOMENTUM_THRESHOLD = 0.0
 
-SYMBOL = 'EUR'
-CURRENCY = 'USD'
-EXCHANGE = 'IDEALPRO'
 POSITION_SIZE = 20000   # EUR
-INITIAL_CAPITAL = 20000  # EUR
+INITIAL_CAPITAL = 20000  # EUR (overridden by actual EUR balance at startup)
 ```
 
 ### Maintenance Window
@@ -267,9 +254,9 @@ The bot does not close open positions when entering the maintenance window. Note
 ### IB Gateway Connection
 
 ```python
-HOST = '127.0.0.1'   # localhost for local testing
-PORT = 4002           # IB Gateway paper trading
-CLIENT_ID = 1
+IB_HOST = 'localhost'  # IB Gateway running on same machine
+IB_PORT = 4002         # Paper trading port (4001 for live)
+IB_CLIENT_ID = 1       # Unique client ID (change if running multiple bots)
 ```
 
 ---
