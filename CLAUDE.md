@@ -39,18 +39,22 @@ CPF-Final-Project/
 │   └── optimization/  # GridSearchOptimizer, OptimizationResults
 ├── deployment/
 │   ├── trading_bot.py # Live trading bot (async, ib_async)
-│   ├── config_live.py # Runtime config + Session 6B optimized params
+│   ├── config_live.py # Runtime config + optimized params + maintenance window
 │   ├── Dockerfile     # Build context is project root
 │   ├── requirements.txt
 │   ├── .dockerignore
-│   └── logs/          # Runtime output (gitignored)
+│   └── logs/          # Runtime logs (production committed; dev gitignored)
 ├── scripts/
-│   └── fetch_historical_data.py  # IB Gateway historical fetch
+│   ├── analyze_live_run.py        # Analyse live trading run logs
+│   ├── fetch_historical_data.py   # IB Gateway historical fetch
+│   └── regenerate_results_20k.py  # Re-run optimisation with corrected capital
 ├── data/historical/   # CSV data: {5min,4H,1D}/
-├── docs/handoffs/     # Session handoff documents
-├── notebooks/         # Jupyter analysis (Session 8, pending)
-└── tests/             # Unit tests
+└── docs/
+    ├── handoffs/      # Session handoff documents
+    └── specifications/# Session specification documents
 ```
+
+Note: `migration/` directory exists locally but is NOT in the repo.
 
 ---
 
@@ -235,12 +239,14 @@ run()
 | 09C | 4H deployment prep | Correct params, timeframe-aware bars, baseline positions, IB duration fix |
 | 09D | 4H live run analysis | 0 trades, 112.4 hours, 10 connectivity events all handled; section 9.2 drafted |
 | 10 | Maintenance window + 3rd run prep | Configurable 23:30–06:00 CET pause added; DAILY_SNAPSHOT row; spec stored |
+| 10B | README verification + docs update | Corrected script names, removed non-existent entries, fixed config examples; project-progress.md updated |
 
 ---
 
-## Notebook Status (as of 2026-03-06)
+## Notebook Status (as of 2026-03-11)
 
-Current state: `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
+Deliverable: `ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb` (project root)
+Reference markdown (local only, not in repo): `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
 - Total: 4,947 lines, 10 main sections + Abstract + References
 - Images directory: same folder as the .md file (ignore any subdirectory paths in image refs)
 
@@ -284,7 +290,7 @@ Current state: `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHM
 
 **9.2 Performance Summary:**
 - 5min subsection: Complete (11 trades, −10.24 EUR, 36.4% win rate, 4 reconcile-closed trades)
-- 4H subsection: Draft written, awaiting manual insertion into notebook. File: `migration/03-final-deliverable/04-claude-code-files/section-0902-4-Hour-Timeframe-Run.md`
+- 4H subsection: Draft written, awaiting manual insertion into notebook. File: `migration/03-final-deliverable/04-claude-code-files/section-0902-4-Hour-Timeframe-Run.md` (local only, not in repo)
 - 4H result: 0 trades, EUR 0.00 P&L, 112.4 hours, 10 connectivity events all resolved correctly
 
 **9.3 Lessons Learned:** Complete (infrastructure resilience, reconciliation noise in paper trading, USD balance requirement).
@@ -308,7 +314,7 @@ Current state: `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHM
 
 ## Third Live Run (5min) — Pending
 
-**Status:** Code changes committed (session 10). Run not yet started.
+**Status:** Code changes committed (session 10). Container not yet started.
 **Spec:** `docs/specifications/spec-10-third-run-5min.md`
 **Pre-run checklist (manual steps before starting container):**
 - Set `TIMEFRAME = "5min"` and `RUN_DURATION = "5d"` in `config_live.py`

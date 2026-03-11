@@ -1,7 +1,7 @@
 # CPF Final Project - Progress Report
-**Date:** March 2, 2026
-**Status:** ~97% Complete - 4H Live Test Starting, Notebook Sections 1-8 Complete
-**Timeline:** 4 weeks to deadline (March 31, 2026)
+**Date:** March 11, 2026
+**Status:** ~99% Complete - 3rd Live Run Pending, Notebook Section 9 Partial
+**Timeline:** 3 weeks to deadline (March 31, 2026)
 
 ---
 
@@ -118,6 +118,27 @@
 4. **IB duration limit fix:** Use "14 D" for 4H bars (not "1152000 S")
 5. **Documentation:** Updated handoff, specification, CLAUDE.md
 
+### Session 09D: 4H Live Run Analysis
+- 0 trades over 112.4 hours (March 1–6, 2026): EUR 0.00 P&L
+- 10 connectivity events: 5 hard disconnects at 23:45 UTC + 5 soft reboots at ~05:22–05:49 UTC
+- All 10 recovered autonomously; all reconciliations confirmed FLAT position
+- 0 Error 201 (EUR→USD pre-conversion successful)
+- Statistical context: 0 trades is ~74% probability outcome (~15 trades/year backtest rate)
+- Section 9.2 4H content drafted
+
+### Session 10: Maintenance Window + 3rd Run Preparation
+- Configurable maintenance window pause added to `trading_bot.py` (23:30–06:00 CET per spec,
+  corrected to 00:30–06:45 CET to cover actual IB Gateway event times)
+- `MAINTENANCE_WINDOW_START` / `MAINTENANCE_WINDOW_END` in `config_live.py`
+- Uses `pytz.timezone("Europe/Berlin")` for CET/CEST-aware checks
+- DAILY_SNAPSHOT row appended to trade CSV at 23:29 CET each night
+- Spec stored: `docs/specifications/spec-10-third-run-5min.md`
+
+### Session 10B: README Verification and Correction
+- Corrected script filenames (regenerate_results_20k.py, added analyze_live_run.py)
+- Removed non-existent docs/guides/ from tree, removed non-existent optimize_parameters.py
+- Fixed configuration examples to match actual config_live.py (flat vars, correct IB names)
+
 ---
 
 ## Optimized Strategy Parameters (Session 8A — corrected)
@@ -175,48 +196,62 @@ Optimal parameters are identical across all position size/capital combinations.
 
 **Sharpe ratio:** -0.87 (indicative only, not meaningful over 5 days)
 
-### Production 4-Hour Test (Mar 2-6, 2026) — In Progress
+### Production 4-Hour Test (Mar 1–6, 2026) — Session 09D
 
-**Status:** Started March 2, 2026 (Sunday evening)
-**Configuration:** 4H timeframe, 5-day runtime, optimized parameters (SMA 20/70, RSI 35/70)
-**Fixes applied:**
-- Corrected RSI_PERIOD=14, MOMENTUM_PERIOD=10 (were wrong: 21, 14)
-- Timeframe-aware bar sizes (uses "14 D" for 4H historical requests)
-- Baseline position snapshot (ignores EUR→USD conversion position)
-- EUR→USD conversion completed (~500K EUR → ~590K USD)
+**Duration:** 112.4 hours (March 1, 23:38 CET → March 6, 16:01 CET)
+**Trades:** 0 | **P&L:** EUR 0.00 | **Capital:** EUR 952,192.21 (unchanged)
 
-**Expected:** ~2-3 trades over 5 days (4H bars complete every 4 hours, strategy is selective)
+**Infrastructure Performance:**
+- 5 hard disconnects at 23:45 UTC nightly: all recovered autonomously
+- 5 soft reboots (Error 1100 → 1102) at ~05:22–05:49 UTC: all recovered, reconciliation confirmed FLAT
+- Two nights required exponential backoff (4 attempts); 0 crashes, 0 manual interventions
+
+**Key Finding:**
+0 trades is a ~74% probability outcome given the 4H backtest rate of ~15 trades/year (Poisson model).
+EUR/USD gapped ~100–150 pips lower at Sunday open (US/Israeli geopolitical event); no signal conditions
+satisfied despite the directional move. Not an anomaly.
+
+### Production 5-Minute Test (3rd Run) — Pending
+
+**Status:** Code committed (Session 10). Container not yet started.
+**Configuration:** 5min timeframe, 5-day runtime, maintenance window 00:30–06:45 CET
+**Purpose:** Eliminate reconciliation noise from first run (7/11 trades closed by IB nightly reset)
+**Container name:** `trading-bot-5min-r3`
 
 ---
 
 ## Notebook Progress
 
-Notebook content is being written as markdown files in
-`migration/03-final-deliverable/04-claude-code-files/` (gitignored, managed separately).
+The deliverable notebook is `ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb` (project root).
+Current state reference: `migration/03-final-deliverable/03d-current-nb-20260306/` (local only, not in repo).
 
-| Section | Status | File |
-|---------|--------|------|
-| 1. Introduction | Written | `section-01-introduction.md` |
-| 2. Project Setup | Written | `section-02-project-setup.md` |
-| 3. Data Acquisition | Written | `section-03-data-acquisition.md` |
-| 4. Technical Indicators | Written | `section-04-technical-indicators.md` |
-| 5. Signal Generation | Written | `section-05-signal-generation.md` |
-| 6. Backtest & Optimization | Written | `section-06-backtest-implementation.md` |
-| 7. Live Trading | Pending | — |
-| 8. (reserved) | — | — |
-| 9. Results & Analysis | Pending | Needs live trading data |
-| 10. Conclusion | Pending | — |
-| Abstract | Pending | — |
+| Section | Title | Status |
+|---------|-------|--------|
+| Abstract | — | Complete |
+| 1 | Project Setup | Complete |
+| 2 | Strategic Decisions | Complete |
+| 3 | Data Preparation | Complete |
+| 4 | Technical Indicator Calculation | Complete |
+| 5 | Signal Generation and Position Management | Complete |
+| 6 | Backtest Implementation | Complete |
+| 7 | Live Trading Implementation | Complete |
+| 8 | Cloud Deployment | Complete |
+| 9 | Results from Cloud Trading Run | **Partial** — 9.2 4H pending insertion; 3rd run pending |
+| 10 | Conclusion | Complete |
+| References | — | Complete |
 
 ---
 
 ## Deferred Features
 
-### Error 1100 Backend Disconnect Pause Flag
-- Add `is_backend_connected` flag to `_on_error()` in `trading_bot.py`
-- Pause main loop between Error 1100 (IB daily reset) and Error 1102 (restored)
-- Benefits: cleaner logs, no order attempts during reset
-- **Status:** Documented in Session 8A handoff but not implemented (not critical for project)
+### UTC/CET Maintenance Window Documentation
+- Config values (`MAINTENANCE_WINDOW_START/END`) are in CET; log timestamps are UTC
+- These are not yet documented together inline in config_live.py
+- Future improvement: accept window times in UTC, or add clear inline mapping of UTC event times to CET params
+
+### Error 1100 Granular Pause Flag
+- A tighter pause flag (only between Error 1100 and 1102) would give cleaner logs vs. the broad maintenance window
+- Not critical; the maintenance window already covers the relevant period
 
 ---
 
@@ -232,26 +267,25 @@ CPF-Final-Project/
 │   ├── backtest/      # BacktestEngine, TransactionCosts, metrics
 │   └── optimization/  # GridSearchOptimizer, OptimizationResults
 ├── deployment/
-│   ├── trading_bot.py # Live trading bot (async, ib_async) — Session 7H
-│   ├── config_live.py # Runtime config + optimized params
+│   ├── trading_bot.py # Live trading bot (async, ib_async)
+│   ├── config_live.py # Runtime config + optimized params + maintenance window
 │   ├── Dockerfile     # Build context is project root
 │   ├── requirements.txt
 │   ├── .dockerignore
-│   └── logs/          # Runtime output (gitignored)
+│   └── logs/          # Runtime logs (production run logs committed; dev logs gitignored)
 ├── scripts/
+│   ├── analyze_live_run.py        # Analyse live trading run logs
 │   ├── fetch_historical_data.py   # IB Gateway historical fetch
 │   └── regenerate_results_20k.py  # Session 8A CSV regeneration
 ├── data/
 │   ├── historical/    # CSV data: {5min,4H,1D}/
 │   ├── backtest/      # Backtest result CSVs
 │   └── optimization/  # Optimization result CSVs
-├── docs/
-│   ├── handoffs/      # Session handoff documents (1 through 09C)
-│   ├── specifications/# Session specification documents
-│   ├── ib-currency-conversion-guide.md  # EUR→USD conversion instructions
-│   └── project-progress.md  # This file
-├── notebooks/         # Jupyter analysis (pending)
-└── tests/             # Unit tests
+└── docs/
+    ├── handoffs/      # Session handoff documents
+    ├── specifications/# Session specification documents
+    ├── ib-currency-conversion-guide.md  # EUR→USD conversion instructions
+    └── project-progress.md  # This file
 ```
 
 ---
@@ -282,27 +316,21 @@ CPF-Final-Project/
 
 ## Next Steps
 
-1. **Monitor 4H live test** (Mar 2-6, 2026) — In progress
-   - Watch for first trade execution
-   - Verify no Error 201 rejections (after EUR→USD conversion)
-   - Confirm 4H bar timing and indicator calculations
+1. **Start 3rd live run (5min)** — Container `trading-bot-5min-r3`, 5-day run
+   - Confirm USD balance sufficient before starting
+   - Verify maintenance window fires correctly on first night
 
-2. **Download 4H logs** (Friday, Mar 6 after market close)
-   - Analyze trade performance vs. backtest expectations
-   - Write Session 09D handoff document
+2. **Download 3rd run logs** (after run completes)
+   - Analyse with `scripts/analyze_live_run.py`
+   - Write handoff: `docs/handoffs/session-10-live-results-5min-r3.md`
+   - Key metric: trades closed by reconciliation (was 63.6% in Feb run; target ~0%)
 
-3. **Write notebook sections 7, 9, 10, Abstract** (after 4H test complete)
-   - Section 7: Live Trading Implementation
-   - Section 9: Live Trading Results & Analysis (5min + 4H)
-   - Section 10: Conclusion
-   - Abstract: Project summary
+3. **Complete notebook section 9**
+   - Insert 4H subsection (draft at `migration/04-claude-code-files/section-0902-4-Hour-Timeframe-Run.md`, local only)
+   - Add 3rd run results to section 9.2 (if results warrant inclusion)
+   - Update section 9.3 if new lessons emerged
 
-4. **Final notebook assembly** in Jupyter
-   - Convert markdown sections to .ipynb
-   - Add execution results, charts
-   - Final review and polish
-
-5. **Submit deliverable** (by March 31, 2026)
+4. **Final review and submit** (by March 31, 2026)
 
 ---
 
@@ -314,9 +342,9 @@ CPF-Final-Project/
 | Session handoffs | `docs/handoffs/session-XX-description.md` |
 | Session specifications | `docs/specifications/spec-XXX-description.md` |
 | Deployment guide | `deployment/DEPLOYMENT_GUIDE.md` |
-| Notebook sections | `migration/03-final-deliverable/04-claude-code-files/` (gitignored) |
+| Deliverable notebook | `ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb` (project root) |
 
 ---
 
-**Last Updated:** March 2, 2026
-**Next Action:** Monitor 4H live test (Mar 2-6), download logs Friday, write notebook sections 7/9/10
+**Last Updated:** March 11, 2026
+**Next Action:** Start 3rd live run (5min, `trading-bot-5min-r3`); complete notebook section 9 after run
