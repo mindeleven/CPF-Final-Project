@@ -1,0 +1,9 @@
+Trading Session Summary
+Timeframe: 5min
+Parameters: SMA 15/70, RSI 35/75, Mom 0.0
+Duration: 4 days, 17:05:19.687248
+Total Trades: 9
+Win Rate: 55.6%
+Total P&L: EUR 47.52
+Final Capital: EUR 953,341.27
+Return: 0.00%

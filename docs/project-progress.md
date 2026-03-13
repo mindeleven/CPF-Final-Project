@@ -134,6 +134,10 @@
 - DAILY_SNAPSHOT row appended to trade CSV at 23:29 CET each night
 - Spec stored: `docs/specifications/spec-10-third-run-5min.md`
 
+### Session 11: Third Run (5min) Log Analysis
+- 9 trades, +EUR 47.52, 55.6% win rate; reconciliation closes 44.4% (down from 63.6%)
+- INCLUDE recommended; suggested notebook text for 9.2 and 9.3 drafted in handoff
+
 ### Session 10B: README Verification and Correction
 - Corrected script filenames (regenerate_results_20k.py, added analyze_live_run.py)
 - Removed non-existent docs/guides/ from tree, removed non-existent optimize_parameters.py
@@ -211,12 +215,22 @@ Optimal parameters are identical across all position size/capital combinations.
 EUR/USD gapped ~100–150 pips lower at Sunday open (US/Israeli geopolitical event); no signal conditions
 satisfied despite the directional move. Not an anomaly.
 
-### Production 5-Minute Test (3rd Run) — Pending
+### Production 5-Minute Test (3rd Run, Mar 8–13, 2026) — Session 11
 
-**Status:** Code committed (Session 10). Container not yet started.
-**Configuration:** 5min timeframe, 5-day runtime, maintenance window 00:30–06:45 CET
-**Purpose:** Eliminate reconciliation noise from first run (7/11 trades closed by IB nightly reset)
-**Container name:** `trading-bot-5min-r3`
+**Duration:** 4 days, 17 hours (2026-03-08 22:55 UTC → 2026-03-13 16:00 UTC; ended via CLOSE_BEFORE_WEEKEND)
+**Trades:** 9 total (5 LONG, 4 SHORT) | **P&L:** +EUR 47.52 | **Win rate:** 55.6%
+
+**Reconciliation analysis:**
+- Closed by strategy signal: 4/9 (44.4%) — down from 4/11 (36.4%) in Feb run
+- Closed by IB reconciliation: 4/9 (44.4%) — down from 7/11 (63.6%) in Feb run
+- Closed by weekend shutdown: 1/9 (11.1%)
+
+Maintenance window reduced reconciliation closes but did not eliminate them: positions open before
+23:30 CET are still closed by IB's paper trading reset at 00:45 CET. Structural paper trading
+limitation; irrelevant on live accounts.
+
+**Infrastructure:** 5 hard disconnects + 5 soft reboots, all recovered. 0 Error 201. 0 crashes.
+**Inclusion decision:** INCLUDE — adds quantified improvement; fits existing narrative without structural changes.
 
 ---
 
@@ -316,19 +330,11 @@ CPF-Final-Project/
 
 ## Next Steps
 
-1. **Start 3rd live run (5min)** — Container `trading-bot-5min-r3`, 5-day run
-   - Confirm USD balance sufficient before starting
-   - Verify maintenance window fires correctly on first night
-
-2. **Download 3rd run logs** (after run completes)
-   - Analyse with `scripts/analyze_live_run.py`
-   - Write handoff: `docs/handoffs/session-10-live-results-5min-r3.md`
-   - Key metric: trades closed by reconciliation (was 63.6% in Feb run; target ~0%)
-
-3. **Complete notebook section 9**
+1. **Complete notebook section 9** (primary remaining task)
    - Insert 4H subsection (draft at `migration/04-claude-code-files/section-0902-4-Hour-Timeframe-Run.md`, local only)
-   - Add 3rd run results to section 9.2 (if results warrant inclusion)
-   - Update section 9.3 if new lessons emerged
+   - Insert 3rd run paragraph in 9.2 (draft in `docs/handoffs/session-11-live-results-5min-r3.md`)
+   - Add maintenance window note to 9.3 (draft in same handoff)
+   - Add brief mention to 7.6
 
 4. **Final review and submit** (by March 31, 2026)
 
@@ -346,5 +352,5 @@ CPF-Final-Project/
 
 ---
 
-**Last Updated:** March 11, 2026
-**Next Action:** Start 3rd live run (5min, `trading-bot-5min-r3`); complete notebook section 9 after run
+**Last Updated:** March 13, 2026
+**Next Action:** Insert 3rd run content into notebook section 9 (9.2 paragraph + 9.3 addition + 7.6 mention); final review and submit

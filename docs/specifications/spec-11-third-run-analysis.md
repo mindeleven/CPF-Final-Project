@@ -22,12 +22,13 @@
 ## Log File Locations
 
 ```bash
-# On the droplet:
-deployment/logs/trades_5d-5min-2nd_*.csv
-deployment/logs/trading_bot_5d-5min-2nd_*.log
+# In the local file system:
+deployment/logs/trading_bot_5min_5d_20260308_225504.csv
+deployment/logs/trades_5min_5d_20260308_225504.csv
+deployment/logs/trades_5min_5d_20260308_225504_summary.txt
 ```
 
-Confirm exact filenames before running analysis.
+Confirm exact filenames and start/endtime before running analysis.
 
 ---
 

@@ -240,6 +240,7 @@ run()
 | 09D | 4H live run analysis | 0 trades, 112.4 hours, 10 connectivity events all handled; section 9.2 drafted |
 | 10 | Maintenance window + 3rd run prep | Configurable 23:30–06:00 CET pause added; DAILY_SNAPSHOT row; spec stored |
 | 10B | README verification + docs update | Corrected script names, removed non-existent entries, fixed config examples; project-progress.md updated |
+| 11 | 3rd run (5min) analysis | 9 trades, +47.52 EUR, 55.6% win rate; reconciliation closes 44.4% (down from 63.6%); INCLUDE recommended |
 
 ---
 
@@ -312,16 +313,27 @@ Reference markdown (local only, not in repo): `migration/03-final-deliverable/03
 
 ---
 
-## Third Live Run (5min) — Pending
+## Third Live Run (5min) — Completed
 
-**Status:** Code changes committed (session 10). Container not yet started.
-**Spec:** `docs/specifications/spec-10-third-run-5min.md`
-**Pre-run checklist (manual steps before starting container):**
-- Set `TIMEFRAME = "5min"` and `RUN_DURATION = "5d"` in `config_live.py`
-- Confirm USD balance is sufficient (Error 201 root cause from first run)
-- Confirm baseline position snapshot in place (carried over from 4H run)
-- Confirm 5min params: SMA 15/70, RSI 14 (35/75), Momentum 10 (0.0)
-- Container name: `trading-bot-5min-r3`
+**Status:** Complete. Log analysis done (Session 11).
+**Log files:** `deployment/logs/trading_bot_5min_5d_20260308_225504.log` and `trades_5min_5d_20260308_225504.csv`
+**Full analysis:** `docs/handoffs/session-11-live-results-5min-r3.md`
+**Container:** `trading-bot-5min-2nd` (note: named differently from spec's `trading-bot-5min-r3`)
+**Note:** Volume mount used `/root/trading_bot/logs` instead of `/root/trading_bot/deployment/logs`; files copied manually to correct location.
+
+**Result:** 9 trades, +EUR 47.52, win rate 55.6%, 4 days 17 hours.
+Run ended via CLOSE_BEFORE_WEEKEND (Friday 16:00) ~7 hours before the 5-day timer.
+
+**Reconciliation:** 4/9 trades (44.4%) closed by IB reconciliation — down from 7/11 (63.6%) in Feb run.
+Remaining reconciliation closes: all due to positions open before 23:30 CET window start, then closed
+by IB paper trading reset at 00:45 CET. Structural limitation of paper trading; irrelevant on live account.
+
+**Infrastructure:** 5 hard disconnects + 5 soft reboots, all recovered autonomously. 0 Error 201. 0 crashes.
+All 5 maintenance window entries/exits correct. DAILY_SNAPSHOT fired on 4 of 5 nights (no snapshot on
+final night as run ended before 23:29 CET).
+
+**Inclusion decision:** INCLUDE. Adds quantified reconciliation improvement; fits existing narrative.
+Permitted changes: one paragraph in 9.2, one addition to 9.3, brief mention in 7.6.
 
 **Maintenance window implementation (added in session 10):**
 - `MAINTENANCE_WINDOW_START = "00:30"` and `MAINTENANCE_WINDOW_END = "06:45"` in `config_live.py` (corrected in session 10B — see known issue below)
