@@ -241,60 +241,59 @@ run()
 | 10 | Maintenance window + 3rd run prep | Configurable 23:30–06:00 CET pause added; DAILY_SNAPSHOT row; spec stored |
 | 10B | README verification + docs update | Corrected script names, removed non-existent entries, fixed config examples; project-progress.md updated |
 | 11 | 3rd run (5min) analysis | 9 trades, +47.52 EUR, 55.6% win rate; reconciliation closes 44.4% (down from 63.6%); INCLUDE recommended |
+| 12 | Pre-submission consistency check | Full notebook check: 0 Session refs, all log files committed, README .env.example removed; notebook confirmed complete |
 
 ---
 
-## Notebook Status (as of 2026-03-11)
+## Notebook Status (as of 2026-03-16)
 
 Deliverable: `ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb` (project root)
-Reference markdown (local only, not in repo): `migration/03-final-deliverable/03d-current-nb-20260306/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
-- Total: 4,947 lines, 10 main sections + Abstract + References
-- Images directory: same folder as the .md file (ignore any subdirectory paths in image refs)
+Reference markdown (local only, not in repo): `migration/notebooks/markdown-2026-03-16/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
 
-### Section Line Numbers (03d version)
+### Section Line Numbers (March 16 version)
 
 | Section | Start Line |
 |---------|-----------|
 | Abstract | 11 |
 | 1. Project Setup | 42 |
 | 2. Strategic Decisions | 387 |
-| 3. Data Preparation | 715 |
-| 4. Technical Indicator Calculation | 1340 |
-| 5. Signal Generation and Position Management | 2250 |
-| 6. Backtest Implementation | 2700 |
-| 7. Live Trading Implementation | 4149 |
-| 8. Cloud Deployment | 4366 |
-| 9. Results from Cloud Trading Run | 4802 |
-| 10. Conclusion | 4849 |
-| References | 4908 |
+| 3. Data Preparation | 712 |
+| 4. Technical Indicator Calculation | 1337 |
+| 5. Signal Generation and Position Management | 2247 |
+| 6. Backtest Implementation | 2697 |
+| 7. Live Trading Implementation | 4145 |
+| 8. Cloud Deployment | 4374 |
+| 9. Results from Cloud Trading Run | 4810 |
+| 10. Conclusion | 4874 |
+| References | 4949 |
 
 ### Section Structure
 
 | Section | Title | Status | Key Content |
 |---------|-------|--------|-------------|
-| Abstract | — | Complete | Full abstract including 5min and 4H results summary |
+| Abstract | — | Complete | All three runs summarised; backtест results for 5min and 4H |
 | 1 | Project Setup | Complete | IBKR selection, DigitalOcean setup, Docker, IB Gateway deployment, VNC config |
 | 2 | Strategic Decisions | Complete | EUR/USD rationale, timeframe selection, MA/RSI/Momentum parameter reasoning |
 | 3 | Data Preparation | Complete | Load 3 timeframes, visualizations, quality checks, data limitations |
 | 4 | Technical Indicator Calculation | Complete | SMA, RSI, Momentum implementation + validation |
 | 5 | Signal Generation and Position Management | Complete | Strategy logic, signal→position conversion, validation |
 | 6 | Backtest Implementation | Complete | Results tables, heatmaps, optimal params (SMA 15/70, 20/70) |
-| 7 | Live Trading Implementation | Complete | Requirements, architecture, 8 challenges, testing history (3 runs) |
+| 7 | Live Trading Implementation | Complete | Requirements, architecture, challenges incl. maintenance window, all three runs |
 | 8 | Cloud Deployment | Complete | Docker containerization, deployment process, monitoring, lifecycle mgmt |
-| 9 | Results from Cloud Trading Run | **PARTIAL** | 9.1 complete, 9.2 has 5min results + 4H draft ready, 9.3 complete |
+| 9 | Results from Cloud Trading Run | Complete | All three runs: 5min Feb, 4H Mar, 5min Mar; lessons learned incl. maintenance window |
 | 10 | Conclusion | Complete | All subsections 10.1–10.5 written |
 | References | — | Complete | 16 sources (academic + practitioner) |
 
-### Section 9 — Current State
+### Section 9 — Final State
 
-**9.1 Test Period Specification:** Complete. 4H run confirmed as March 1, 2026 23:38 CET – March 6, 2026 16:01 CET.
+**9.1 Test Period Specification:** Three runs: 5min Feb 23–27 (104.7h), 4H Mar 1–6 (112.4h), 5min Mar 8–13 (113h). Total 330.1h.
 
-**9.2 Performance Summary:**
-- 5min subsection: Complete (11 trades, −10.24 EUR, 36.4% win rate, 4 reconcile-closed trades)
-- 4H subsection: Draft written, awaiting manual insertion into notebook. File: `migration/03-final-deliverable/04-claude-code-files/section-0902-4-Hour-Timeframe-Run.md` (local only, not in repo)
-- 4H result: 0 trades, EUR 0.00 P&L, 112.4 hours, 10 connectivity events all resolved correctly
+**9.2 Performance Summary:** All three subsections complete.
+- 5min Feb: 11 trades, −10.24 EUR, 36.4% win rate, 7/11 reconcile-closed
+- 4H Mar: 0 trades, EUR 0.00 P&L, 10 connectivity events all resolved
+- 5min Mar: 9 trades, +47.52 EUR, 55.6% win rate, 4/9 reconcile-closed (down from 7/11)
 
-**9.3 Lessons Learned:** Complete (infrastructure resilience, reconciliation noise in paper trading, USD balance requirement).
+**9.3 Lessons Learned:** Complete. Four paragraphs: infrastructure resilience, reconciliation noise, maintenance window effect, USD balance requirement.
 
 ### Section 10 — Complete Summary
 
@@ -354,10 +353,8 @@ IB Gateway events occur at:
 
 The original spec assumed the log timestamps were CET and set the window to 23:30–06:00 CET — which was too early and too short. The parameters were corrected manually to 00:30–06:45 CET (which the code interprets via pytz Europe/Berlin correctly). The underlying code logic is sound, but the parameter semantics are confusing: the config values are in CET, the log timestamps are in UTC, and these are currently not documented clearly together. A future improvement should either accept the window times in UTC, or add explicit inline documentation linking the UTC event times to the CET parameter values.
 
-**Log analysis (after run completes):**
-- Save as: `docs/handoffs/session-10-live-results-5min-r3.md`
-- Key comparison metric: trades closed by reconciliation (was 7/11 = 63.6% in Feb run; should be near zero with window active)
-- Filter `direction == "DAILY_SNAPSHOT"` before computing win rate / average P&L
+**Log analysis:** `docs/handoffs/session-11-live-results-5min-r3.md`
+- Filter `direction == "DAILY_SNAPSHOT"` before computing win rate / average P&L (DAILY_SNAPSHOT rows not in `self.trades`; summary stats unaffected)
 
 ---
 
