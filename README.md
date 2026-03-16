@@ -52,7 +52,6 @@ CPF-Final-Project/
 │   ├── Dockerfile                           # Container build (context is project root)
 │   ├── requirements.txt                     # Bot dependencies
 │   ├── .dockerignore
-│   ├── .env.example                         # Environment variables template
 │   ├── logs/                                # Runtime logs
 │   │                                        # (production run logs committed;
 │   │                                        # development logs gitignored)
