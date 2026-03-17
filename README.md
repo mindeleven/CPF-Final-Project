@@ -6,8 +6,8 @@ A production-grade automated forex trading system implementing a multi-indicator
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Interactive Brokers](https://img.shields.io/badge/broker-Interactive%20Brokers-green.svg)](https://www.interactivebrokers.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
+[![License: MIT](https://img.shields.io/badge/Code_License-MIT-yellow.svg)](LICENSE.md)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/Text_License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE.md)
 ---
 
 ## Project Overview
@@ -309,7 +309,12 @@ Cloud deployment (tested configuration):
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project employs a dual-licensing strategy to distinguish between the functional software and the educational narrative:
+
+* **Software & Code:** All Python source code (`.py` files), shell scripts, and code cells within the Jupyter Notebook are licensed under the **MIT License**.
+* **Narrative & Documentation:** The explanatory text, markdown cells in the Jupyter Notebook, and project documentation are licensed under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license.
+
+See the [LICENSE](LICENSE) file for the full legal text of both licenses.
 
 ---
 
