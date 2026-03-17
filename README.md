@@ -314,7 +314,7 @@ This project employs a dual-licensing strategy to distinguish between the functi
 * **Software & Code:** All Python source code (`.py` files), shell scripts, and code cells within the Jupyter Notebook are licensed under the **MIT License**.
 * **Narrative & Documentation:** The explanatory text, markdown cells in the Jupyter Notebook, and project documentation are licensed under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license.
 
-See the [LICENSE](LICENSE) file for the full legal text of both licenses.
+See the [LICENSE](LICENSE.md) file for the full legal text of both licenses.
 
 ---
 
