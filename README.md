@@ -35,7 +35,7 @@ This project implements a complete algorithmic trading system for EUR/USD forex 
 CPF-Final-Project/
 ├── README.md                                # This file
 ├── ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb  # Final deliverable notebook
-├── LICENSE
+├── LICENSE.md
 ├── requirements.txt                         # Python dependencies
 │
 ├── data/                                    # Market data and results storage
