@@ -248,9 +248,9 @@ run()
 ## Notebook Status (as of 2026-03-16)
 
 Deliverable: `ALGORITHMIC-TRADING-FINAL-PROJECT.ipynb` (project root)
-Reference markdown (local only, not in repo): `migration/notebooks/markdown-2026-03-16/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
+Reference markdown (local only, not in repo): `migration/notebooks/markdown-2026-03-18/ALGORITHMIC-TRADING-FINAL-PROJECT.md`
 
-### Section Line Numbers (March 16 version)
+### Section Line Numbers (March 18 version)
 
 | Section | Start Line |
 |---------|-----------|
