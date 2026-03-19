@@ -102,7 +102,7 @@ class Strategy(ABC):
             >>> signals:   [0, 0, 1, 0, 0, -1, 0, 0, 1]
             >>> positions: [0, 0, 1, 1, 1, -1, -1, -1, 1]
         """
-        positions = signals.replace(0, pd.NA).ffill().fillna(0).infer_objects(copy=False).astype(int)
+        positions = signals.replace(0, pd.NA).astype(pd.Int64Dtype()).ffill().fillna(0).astype(int)
         return positions
 
     def get_signal_count(self, signals: pd.DataFrame) -> Dict[str, int]:
