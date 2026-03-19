@@ -102,6 +102,7 @@ Note: `migration/` directory exists locally but is NOT in the repo.
 - Positions: `1` = LONG, `-1` = SHORT, `0` = FLAT (forward-filled until opposite signal)
 - Works on a copy of the input DataFrame (does not mutate original)
 - Output columns: `sma_fast`, `sma_slow`, `rsi`, `momentum`, `signal`, `position`
+- Position forward-fill: `replace(0, pd.NA).astype(pd.Int64Dtype()).ffill().fillna(0).astype(int)` — nullable Int64 required to avoid pandas 2.2 FutureWarning during ffill on object-dtype arrays
 
 ### Backtest (`modules/backtest`)
 
@@ -242,6 +243,7 @@ run()
 | 10B | README verification + docs update | Corrected script names, removed non-existent entries, fixed config examples; project-progress.md updated |
 | 11 | 3rd run (5min) analysis | 9 trades, +47.52 EUR, 55.6% win rate; reconciliation closes 44.4% (down from 63.6%); INCLUDE recommended |
 | 12 | Pre-submission consistency check | Full notebook check: 0 Session refs, all log files committed, README .env.example removed; notebook confirmed complete |
+| 13 | Colab compatibility + pandas fix | git clone cell fixed (named dir + chdir); FutureWarning fixed in strategy/base.py (nullable Int64 before ffill); notebook verified on Colab |
 
 ---
 
