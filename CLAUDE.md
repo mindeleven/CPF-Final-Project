@@ -405,6 +405,10 @@ The original spec assumed the log timestamps were CET and set the window to 23:3
 
 ### Book-Based Strategy Directions (to be explored)
 
-- **Kathy Lien** — *Day Trading and Swing Trading the Currency Market*: FX-specific tactical approaches
-- **Andreas Clenow** — *Stocks on the Move*: systematic momentum framework (equity-focused; adapt for FX/futures)
-- **Jack Schwager** — *A Complete Guide to the Futures Market*: technical analysis and system design principles for futures; strategy frameworks applicable to forex
+The vision is a multi-asset portfolio approach rather than single-instrument FX trading. Each book informs the strategy for its native asset class; the portfolio layer combines them with a correlation, regime, and macro/geopolitical filter that allocates or switches between asset classes dynamically. Instruments are selected for low cross-asset correlation so that the portfolio behaves differently from any single strategy run in isolation.
+
+- **Kathy Lien** — *Day Trading and Swing Trading the Currency Market*: FX strategies (the current EUR/USD work as foundation)
+- **Andreas Clenow** — *Stocks on the Move*: systematic momentum approach for equities
+- **Jack Schwager** — *A Complete Guide to the Futures Market*: strategy design for futures
+
+The portfolio-level layer — regime detection, trend filters, macro/geopolitical event handling, cross-asset correlation management, and capital allocation across strategies — is the novel design challenge that sits above the individual asset class strategies.
