@@ -1,7 +1,6 @@
 # CPF Final Project - Progress Report
-**Date:** March 16, 2026
-**Status:** Complete — ready for submission
-**Timeline:** 2 weeks to deadline (March 31, 2026)
+**Date:** March 20, 2026
+**Status:** Submitted — awaiting revision
 
 ---
 
@@ -352,5 +351,5 @@ CPF-Final-Project/
 
 ---
 
-**Last Updated:** March 16, 2026
-**Next Action:** Submit deliverable notebook by March 31, 2026
+**Last Updated:** March 20, 2026
+**Next Action:** Await revision feedback. Further development continues from a fork of this repo.

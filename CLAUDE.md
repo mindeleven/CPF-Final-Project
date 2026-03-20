@@ -376,3 +376,35 @@ The original spec assumed the log timestamps were CET and set the window to 23:3
 **Statistical context:** 0 trades is a ~74% probability outcome given the backtest rate of ~15 trades/year. Not an anomaly.
 
 **Market context:** EUR/USD gapped ~100–150 pips lower at Sunday open (US/Israeli strikes on Iran). Rate fell from ~1.177 to ~1.155 by mid-week, then partially recovered to ~1.162. No signal conditions were satisfied despite the directional move.
+
+---
+
+## Next Phase (Fork)
+
+**Status:** CPF project submitted March 2026, awaiting revision. Further development continues from a fork of this repo.
+
+**Starting architecture:** The OO framework — `Strategy` ABC, `Indicator` ABC, `BacktestEngine`, `GridSearchOptimizer` — is the stable foundation. The fork extends it rather than replacing it. A risk management layer (dynamic position sizing, sitting between signal generation and order execution) is the most significant anticipated structural addition.
+
+**Workflow:** Same as this project — Claude Code on the command line for implementation, LLM chat interface (Perplexity or similar) for planning and design discussion. The specific roadmap is TBD pending a brainstorming phase.
+
+### Future Directions from Section 10.4
+
+| Theme | Description |
+|-------|-------------|
+| Paginated data retrieval | Sequential `reqHistoricalData` calls with offset end dates to build 2–3 year 5-minute dataset |
+| Local time-series database | Replace static CSVs with a persistent store; enables regime-sliced backtesting over full IB history |
+| Train/test split | Reserve most recent 6–12 months as held-out test set; eliminates in-sample reporting bias |
+| Risk management layer | Dynamic position sizing (ATR-based); OO module between signal and execution layers |
+| Sortino ratio | Complement Sharpe with downside-only volatility measure; meaningful for always-in strategies |
+| Programmatic FX conversion | Automate EUR→USD at startup via IB IdealPro; eliminates manual Error 201 preparation |
+| Second strategy | Mean-reversion alongside trend-following; capital allocation across strategies |
+| Multiple currency pairs | GBP/USD, USD/JPY — test whether edge is EUR/USD-specific or generalises |
+| Market regime filter | ATR thresholds or longer-period indicators; reduce/suspend in high-uncertainty environments |
+| Session close rule | Close positions at ~22:00–23:00 CET daily; test edge concentration in active sessions |
+| Maintenance window in UTC | Accept window times in UTC; eliminate CET/UTC traceability gap in config vs. logs |
+
+### Book-Based Strategy Directions (to be explored)
+
+- **Kathy Lien** — *Day Trading and Swing Trading the Currency Market*: FX-specific tactical approaches
+- **Andreas Clenow** — *Stocks on the Move*: systematic momentum framework (equity-focused; adapt for FX/futures)
+- **Jack Schwager** — *A Complete Guide to the Futures Market*: technical analysis and system design principles for futures; strategy frameworks applicable to forex
